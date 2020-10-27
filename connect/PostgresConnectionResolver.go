@@ -1,10 +1,12 @@
 package connect
 
 import (
+	"strconv"
 	"sync"
 
 	pgx4 "github.com/jackc/pgx/v4"
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
+	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
 	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	crefer "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	"github.com/pip-services3-go/pip-services3-components-go/auth"
@@ -153,13 +155,100 @@ func (c *PostgresConnectionResolver) composeConfig(connections []*ccon.Connectio
 
 }
 
+func (c *PostgresConnectionResolver) composeUri(connections []*ccon.ConnectionParams, credential *auth.CredentialParams) string {
+	// If there is a uri then return it immediately
+	for _, connection := range connections {
+		uri := connection.Uri()
+		if uri != "" {
+			return uri
+		}
+	}
+
+	// Define hosts
+	var hosts = ""
+	for _, connection := range connections {
+		host := connection.Host()
+		port := connection.Port()
+
+		if len(hosts) > 0 {
+			hosts += ","
+		}
+		if port != 0 {
+			hosts += host + ":" + strconv.Itoa(port)
+		}
+	}
+
+	// Define database
+	database := ""
+	for _, connection := range connections {
+		if database == "" {
+			database = *connection.GetAsNullableString("database")
+		}
+	}
+	if len(database) > 0 {
+		database = "/" + database
+	}
+
+	// Define authentication part
+	var auth = ""
+	if credential != nil {
+		var username = credential.Username()
+		if len(username) > 0 {
+			var password = credential.Password()
+			if len(password) > 0 {
+				auth = username + ":" + password + "@"
+			} else {
+				auth = username + "@"
+			}
+		}
+	}
+	// Define additional parameters
+	consConf := cdata.NewEmptyStringValueMap()
+	for _, v := range connections {
+		consConf.Append(v.Value())
+	}
+	var options *cconf.ConfigParams
+	if credential != nil {
+		options = cconf.NewConfigParamsFromMaps(consConf.Value(), credential.Value())
+	} else {
+		options = cconf.NewConfigParamsFromValue(consConf.Value())
+	}
+	options.Remove("uri")
+	options.Remove("host")
+	options.Remove("port")
+	options.Remove("database")
+	options.Remove("username")
+	options.Remove("password")
+	params := ""
+	keys := options.Keys()
+	for _, key := range keys {
+		if len(params) > 0 {
+			params += "&"
+		}
+		params += key
+
+		value := options.GetAsString(key)
+		if value != "" {
+			params += "=" + value
+		}
+	}
+	if len(params) > 0 {
+		params = "?" + params
+	}
+
+	// Compose uri
+	uri := "postgres://" + auth + hosts + database + params
+
+	return uri
+}
+
 // Resolve method are resolves Postgres connection URI from connection and credential parameters.
 // Parameters:
 // 	- correlationId  string
 //	(optional) transaction id to trace execution through call chain.
 // Returns uri string, err error
 // resolved URI and error, if this occured.
-func (c *PostgresConnectionResolver) Resolve(correlationId string) (config *pgx4.ConnConfig, err error) {
+func (c *PostgresConnectionResolver) Resolve(correlationId string) (uri string, err error) {
 	var connections []*ccon.ConnectionParams
 	var credential *auth.CredentialParams
 	var errCred, errConn error
@@ -183,10 +272,12 @@ func (c *PostgresConnectionResolver) Resolve(correlationId string) (config *pgx4
 	wg.Wait()
 
 	if errConn != nil {
-		return nil, errConn
+		return "", errConn
 	}
 	if errCred != nil {
-		return nil, errCred
+		return "", errCred
 	}
-	return c.composeConfig(connections, credential)
+	//return c.composeConfig(connections, credential)
+	uri = c.composeUri(connections, credential)
+	return uri, nil
 }

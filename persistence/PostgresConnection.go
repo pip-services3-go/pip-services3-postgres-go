@@ -75,9 +75,7 @@ func NewPostgresConnection() *PostgresConnection {
 //   - config    configuration parameters to be set.
 func (c *PostgresConnection) Configure(config *cconf.ConfigParams) {
 	config = config.SetDefaults(c.defaultConfig)
-
 	c.ConnectionResolver.Configure(config)
-
 	c.Options = c.Options.Override(config.GetSection("options"))
 }
 
@@ -99,7 +97,7 @@ func (c *PostgresConnection) IsOpen() bool {
 //  - Return 			error or nil no errors occured.
 func (c *PostgresConnection) Open(correlationId string) error {
 
-	config, err := c.ConnectionResolver.Resolve(correlationId)
+	uri, err := c.ConnectionResolver.Resolve(correlationId)
 
 	if err != nil {
 		c.Logger.Error(correlationId, err, "Failed to resolve Postgres connection")
@@ -110,17 +108,15 @@ func (c *PostgresConnection) Open(correlationId string) error {
 	idleTimeoutMS := c.Options.GetAsNullableInteger("idle_timeout")
 	connectTimeoutMS := c.Options.GetAsNullableInteger("connect_timeout")
 
+	config, err := pgxpool.ParseConfig(uri)
+
 	if connectTimeoutMS != nil && *connectTimeoutMS != 0 {
-		config.ConnectTimeout = time.Duration((int64)(*connectTimeoutMS)) * time.Millisecond
+		config.ConnConfig.ConnectTimeout = time.Duration((int64)(*connectTimeoutMS)) * time.Millisecond
 	}
 
 	c.Logger.Debug(correlationId, "Connecting to postgres")
 
-	options := &pgxpool.Config{
-		ConnConfig: config,
-	}
-
-	pool, err := pgxpool.ConnectConfig(context.Background(), options)
+	pool, err := pgxpool.ConnectConfig(context.Background(), config)
 
 	if err != nil || pool == nil {
 		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").WithCause(err)
@@ -132,7 +128,7 @@ func (c *PostgresConnection) Open(correlationId string) error {
 			pool.Config().MaxConns = (int32)(*maxPoolSize)
 		}
 		c.Connection = pool
-		c.DatabaseName = config.Database
+		c.DatabaseName = config.ConnConfig.Database
 	}
 	return err
 }

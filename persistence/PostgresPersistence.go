@@ -1,746 +1,858 @@
 package persistence
 
-///* @module persistence */
-// const _ = require('lodash');
-// const async = require('async');
-
-// import { IReferenceable } from 'pip-services3-commons-node';
-// import { IUnreferenceable } from 'pip-services3-commons-node';
-// import { IReferences } from 'pip-services3-commons-node';
-// import { IConfigurable } from 'pip-services3-commons-node';
-// import { IOpenable } from 'pip-services3-commons-node';
-// import { ICleanable } from 'pip-services3-commons-node';
-// import { ConfigParams } from 'pip-services3-commons-node';
-// import { PagingParams } from 'pip-services3-commons-node';
-// import { DataPage } from 'pip-services3-commons-node';
-// import { ConnectionException } from 'pip-services3-commons-node';
-// import { InvalidStateException } from 'pip-services3-commons-node';
-// import { DependencyResolver } from 'pip-services3-commons-node';
-// import { LongConverter } from 'pip-services3-commons-node';
-// import { CompositeLogger } from 'pip-services3-components-node';
-
-// import { PostgresConnection } from './PostgresConnection';
-
-///*
-//  * Abstract persistence component that stores data in PostgreSQL using plain driver.
-//  *
-//  * This is the most basic persistence component that is only
-//  * able to store data items of any type. Specific CRUD operations
-//  * over the data items must be implemented in child classes by
-//  * accessing this._db or this._collection properties.
-//  *
-//  * ### Configuration parameters ###
-//  *
-//  * - collection:                  (optional) PostgreSQL collection name
-//  * - connection(s):
-//  *   - discovery_key:             (optional) a key to retrieve the connection from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]]
-//  *   - host:                      host name or IP address
-//  *   - port:                      port number (default: 27017)
-//  *   - uri:                       resource URI or connection string with all parameters in it
-//  * - credential(s):
-//  *   - store_key:                 (optional) a key to retrieve the credentials from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/auth.icredentialstore.html ICredentialStore]]
-//  *   - username:                  (optional) user name
-//  *   - password:                  (optional) user password
-//  * - options:
-//  *   - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
-//  *   - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
-//  *   - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
-//  *
-//  * ### References ###
-//  *
-//  * - \*:logger:\*:\*:1.0           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages
-//  * - \*:discovery:\*:\*:1.0        (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]] services
-//  * - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
-//  *
-//  * ### Example ###
-//  *
-//  *     class MyPostgresPersistence extends PostgresPersistence<MyData> {
-//  *
-//  *       public constructor() {
-//  *           base("mydata");
-//  *       }
-//  *
-//  *       public getByName(correlationId: string, name: string, callback: (err, item) => void): void {
-//  *         let criteria = { name: name };
-//  *         this._model.findOne(criteria, callback);
-//  *       });
-//  *
-//  *       public set(correlatonId: string, item: MyData, callback: (err) => void): void {
-//  *         let criteria = { name: item.name };
-//  *         let options = { upsert: true, new: true };
-//  *         this._model.findOneAndUpdate(criteria, item, options, callback);
-//  *       }
-//  *
-//  *     }
-//  *
-//  *     let persistence = new MyPostgresPersistence();
-//  *     persistence.configure(ConfigParams.fromTuples(
-//  *         "host", "localhost",
-//  *         "port", 27017
-//  *     ));
-//  *
-//  *     persitence.open("123", (err) => {
-//  *          ...
-//  *     });
-//  *
-//  *     persistence.set("123", { name: "ABC" }, (err) => {
-//  *         persistence.getByName("123", "ABC", (err, item) => {
-//  *             console.log(item);                   // Result: { name: "ABC" }
-//  *         });
-//  *     });
-//  */
-// export class PostgresPersistence<T> implements IReferenceable, IUnreferenceable, IConfigurable, IOpenable, ICleanable {
-
-//     private static _defaultConfig: ConfigParams = ConfigParams.fromTuples(
-//         "collection", null,
-//         "dependencies.connection", "*:connection:postgres:*:1.0",
-
-//         // connections.*
-//         // credential.*
-
-//         "options.max_pool_size", 2,
-//         "options.keep_alive", 1,
-//         "options.connect_timeout", 5000,
-//         "options.auto_reconnect", true,
-//         "options.max_page_size", 100,
-//         "options.debug", true
-//     );
-
-//     private _config: ConfigParams;
-//     private _references: IReferences;
-//     private _opened: boolean;
-//     private _localConnection: boolean;
-//     private _autoObjects: string[] = [];
-
-//    /*
-//      * The dependency resolver.
-//      */
-//     protected _dependencyResolver: DependencyResolver = new DependencyResolver(PostgresPersistence._defaultConfig);
-//    /*
-//      * The logger.
-//      */
-//     protected _logger: CompositeLogger = new CompositeLogger();
-
-//    /*
-//      * The PostgreSQL connection component.
-//      */
-//     protected _connection: PostgresConnection;
-
-//    /*
-//      * The PostgreSQL connection pool object.
-//      */
-//     protected _client: any;
-//    /*
-//      * The PostgreSQL database name.
-//      */
-//     protected _databaseName: string;
-//    /*
-//      * The PostgreSQL table object.
-//      */
-//     protected _tableName: string;
-
-//     protected _maxPageSize: number = 100;
-
-//    /*
-//      * Creates a new instance of the persistence component.
-//      *
-//      * - tableName    (optional) a table name.
-//      */
-//     public constructor(tableName?: string) {
-//         this._tableName = tableName;
-//     }
-
-//    /*
-//      * Configures component by passing configuration parameters.
-//      *
-//      * - config    configuration parameters to be set.
-//      */
-//     public configure(config: ConfigParams): void {
-//         config = config.setDefaults(PostgresPersistence._defaultConfig);
-//         this._config = config;
-
-//         this._dependencyResolver.configure(config);
-
-//         this._tableName = config.getAsStringWithDefault("collection", this._tableName);
-//         this._tableName = config.getAsStringWithDefault("table", this._tableName);
-//         this._maxPageSize = config.getAsIntegerWithDefault("options.max_page_size", this._maxPageSize);
-//     }
-
-//    /*
-// 	 * Sets references to dependent components.
-// 	 *
-// 	 * - references 	references to locate the component dependencies.
-//      */
-//     public setReferences(references: IReferences): void {
-//         this._references = references;
-//         this._logger.setReferences(references);
-
-//         // Get connection
-//         this._dependencyResolver.setReferences(references);
-//         this._connection = this._dependencyResolver.getOneOptional('connection');
-//         // Or create a local one
-//         if (this._connection == null) {
-//             this._connection = this.createConnection();
-//             this._localConnection = true;
-//         } else {
-//             this._localConnection = false;
-//         }
-//     }
-
-//    /*
-// 	 * Unsets (clears) previously set references to dependent components.
-//      */
-//     public unsetReferences(): void {
-//         this._connection = null;
-//     }
-
-//     private createConnection(): PostgresConnection {
-//         let connection = new PostgresConnection();
-
-//         if (this._config)
-//             connection.configure(this._config);
-
-//         if (this._references)
-//             connection.setReferences(this._references);
-
-//         return connection;
-//     }
-
-//    /*
-//      * Adds index definition to create it on opening
-//      * - keys index keys (fields)
-//      * - options index options
-//      */
-//     protected ensureIndex(name: string, keys: any, options?: any): void {
-//         let builder = "CREATE";
-//         options = options || {};
-
-//         if (options.unique) {
-//             builder += " UNIQUE";
-//         }
-
-//         builder += " INDEX IF NOT EXISTS " + name + " ON " + this.quoteIdentifier(this._tableName);
-
-//         if (options.type) {
-//             builder += " " + options.type;
-//         }
-
-//         let fields = "";
-//         for (let key in keys) {
-//             if (fields != "") fields += ", ";
-//             fields += this.quoteIdentifier(key);
-//             let asc = keys[key];
-//             if (!asc) fields += " DESC";
-//         }
-
-//         builder += "(" + fields + ")";
-
-//         this.autoCreateObject(builder);
-//     }
-
-//    /*
-//      * Adds index definition to create it on opening
-//      * - dmlStatement DML statement to autocreate database object
-//      */
-//     protected autoCreateObject(dmlStatement: string): void {
-//         this._autoObjects.push(dmlStatement);
-//     }
-
-//    /*
-//      * Converts object value from internal to public format.
-//      *
-//      * - value     an object in internal format to convert.
-//      * Returns converted object in public format.
-//      */
-//     protected convertToPublic(value: any): any {
-//         return value;
-//     }
-
-//    /*
-//      * Convert object value from public to internal format.
-//      *
-//      * - value     an object in public format to convert.
-//      * Returns converted object in internal format.
-//      */
-//     protected convertFromPublic(value: any): any {
-//         return value;
-//     }
-
-//     protected quoteIdentifier(value: string): string {
-//         if (value == null || value == "") return value;
-
-//         if (value[0] == '"') return value;
-
-//         return '"' + value + '"';
-//     }
-
-//    /*
-// 	 * Checks if the component is opened.
-// 	 *
-// 	 * Returns true if the component has been opened and false otherwise.
-//      */
-//     public isOpen(): boolean {
-//         return this._opened;
-//     }
-
-//    /*
-// 	 * Opens the component.
-// 	 *
-// 	 * - correlationId 	(optional) transaction id to trace execution through call chain.
-//      * - callback 			callback function that receives error or null no errors occured.
-//      */
-//     public open(correlationId: string, callback?: (err: any) => void): void {
-//     	if (this._opened) {
-//             callback(null);
-//             return;
-//         }
-
-//         if (this._connection == null) {
-//             this._connection = this.createConnection();
-//             this._localConnection = true;
-//         }
-
-//         let openCurl = (err) => {
-//             if (err == null && this._connection == null) {
-//                 err = new InvalidStateException(correlationId, 'NO_CONNECTION', 'PostgreSQL connection is missing');
-//             }
-
-//             if (err == null && !this._connection.isOpen()) {
-//                 err = new ConnectionException(correlationId, "CONNECT_FAILED", "PostgreSQL connection is not opened");
-//             }
-
-//             this._opened = false;
-
-//             if (err) {
-//                 if (callback) callback(err);
-//             } else {
-//                 this._client = this._connection.getConnection();
-//                 this._databaseName = this._connection.getDatabaseName();
-
-//                 // Recreate objects
-//                 this.autoCreateObjects(correlationId, (err) => {
-//                     if (err) {
-//                         this._client == null;
-//                         err = new ConnectionException(correlationId, "CONNECT_FAILED", "Connection to postgres failed").withCause(err);
-//                     } else {
-//                         this._opened = true;
-//                         this._logger.debug(correlationId, "Connected to postgres database %s, collection %s", this._databaseName, this.quoteIdentifier(this._tableName));
-//                     }
-
-//                     if (callback) callback(err);
-//                 });
-//             }
-//         };
-
-//         if (this._localConnection) {
-//             this._connection.open(correlationId, openCurl);
-//         } else {
-//             openCurl(null);
-//         }
-
-//     }
-
-//    /*
-// 	 * Closes component and frees used resources.
-// 	 *
-// 	 * - correlationId 	(optional) transaction id to trace execution through call chain.
-//      * - callback 			callback function that receives error or null no errors occured.
-//      */
-//     public close(correlationId: string, callback?: (err: any) => void): void {
-//     	if (!this._opened) {
-//             callback(null);
-//             return;
-//         }
-
-//         if (this._connection == null) {
-//             callback(new InvalidStateException(correlationId, 'NO_CONNECTION', 'Postgres connection is missing'));
-//             return;
-//         }
-
-//         let closeCurl = (err) => {
-//             this._opened = false;
-//             this._client = null;
-
-//             if (callback) callback(err);
-//         }
-
-//         if (this._localConnection) {
-//             this._connection.close(correlationId, closeCurl);
-//         } else {
-//             closeCurl(null);
-//         }
-//     }
-
-//    /*
-// 	 * Clears component state.
-// 	 *
-// 	 * - correlationId 	(optional) transaction id to trace execution through call chain.
-//      * - callback 			callback function that receives error or null no errors occured.
-//      */
-//     public clear(correlationId: string, callback?: (err: any) => void): void {
-//         // Return error if collection is not set
-//         if (this._tableName == null) {
-//             if (callback) callback(new Error('Table name is not defined'));
-//             return;
-//         }
-
-//         let query = "DELETE FROM " + this.quoteIdentifier(this._tableName);
-
-//         this._client.query(query, (err, result) => {
-//             if (err) {
-//                 err = new ConnectionException(correlationId, "CONNECT_FAILED", "Connection to postgres failed")
-//                     .withCause(err);
-//             }
-
-//             if (callback) callback(err);
-//         });
-//     }
-
-//     protected autoCreateObjects(correlationId: string, callback: (err: any) => void): void {
-//         if (this._autoObjects == null || this._autoObjects.length == 0) {
-//             callback(null);
-//             return null;
-//         }
-
-//         // Check if table exist to determine weither to auto create objects
-//         let query = "SELECT to_regclass('" + this._tableName + "')";
-//         this._client.query(query, (err, result) => {
-//             if (err) {
-//                 callback(err);
-//                 return;
-//             }
-
-//             // If table already exists then exit
-//             if (result.rows && result.rows.length > 0 && result.rows[0].to_regclass != null) {
-//                 callback(err);
-//                 return;
-//             }
-
-//             this._logger.debug(correlationId, 'Table ' + this._tableName + ' does not exist. Creating database objects...');
-
-//             // Run all DML commands
-//             async.eachSeries(this._autoObjects, (dml, callback) => {
-//                 this._client.query(dml, (err, result) => {
-//                     if (err) {
-//                         this._logger.error(correlationId, err, 'Failed to autocreate database object');
-//                     }
-//                     callback(err);
-//                 });
-//             }, callback);
-//         });
-//     }
-
-//    /*
-//      * Generates a list of column names to use in SQL statements like: "column1,column2,column3"
-//      * - values an array with column values or a key-value map
-//      * Returns a generated list of column names
-//      */
-//     protected generateColumns(values: any): string {
-//         values = !_.isArray(values) ? _.keys(values) : values;
-
-//         let result = "";
-//         for (let value of values) {
-//             if (result != "") result += ",";
-//             result += this.quoteIdentifier(value);
-//         }
-
-//         return result;
-//     }
-
-//    /*
-//      * Generates a list of value parameters to use in SQL statements like: "$1,$2,$3"
-//      * - values an array with values or a key-value map
-//      * Returns a generated list of value parameters
-//      */
-//     protected generateParameters(values: any): string {
-//         values = !_.isArray(values) ? _.keys(values) : values;
-
-//         let index = 1;
-//         let result = "";
-//         for (let value of values) {
-//             if (result != "") result += ",";
-//             result += "$" + index;
-//             index++;
-//         }
-
-//         return result;
-//     }
-
-//    /*
-//      * Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
-//      * - values a key-value map with columns and values
-//      * Returns a generated list of column sets
-//      */
-//     protected generateSetParameters(values: any): string {
-//         let result = "";
-//         let index = 1;
-//         for (let column in values) {
-//             if (result != "") result += ",";
-//             result += this.quoteIdentifier(column) + "=$" + index;
-//             index++;
-//         }
-
-//         return result;
-//     }
-
-//    /*
-//      * Generates a list of column parameters
-//      * - values a key-value map with columns and values
-//      * Returns a generated list of column values
-//      */
-//     protected generateValues(values: any): any[] {
-//         return _.values(values);
-//     }
-
-//    /*
-//      * Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
-//      *
-//      * This method shall be called by a public getPageByFilter method from child class that
-//      * receives FilterParams and converts them into a filter function.
-//      *
-//      * - correlationId     (optional) transaction id to trace execution through call chain.
-//      * - filter            (optional) a filter JSON object
-//      * - paging            (optional) paging parameters
-//      * - sort              (optional) sorting JSON object
-//      * - select            (optional) projection JSON object
-//      * - callback          callback function that receives a data page or error.
-//      */
-//     protected getPageByFilter(correlationId: string, filter: any, paging: PagingParams,
-//         sort: any, select: any, callback: (err: any, items: DataPage<T>) => void): void {
-
-//         select = select && !_.isEmpty(select) ? select : "*"
-//         let query = "SELECT " + select + " FROM " + this.quoteIdentifier(this._tableName);
-
-//         // Adjust max item count based on configuration
-//         paging = paging || new PagingParams();
-//         let skip = paging.getSkip(-1);
-//         let take = paging.getTake(this._maxPageSize);
-//         let pagingEnabled = paging.total;
-
-//         if (filter && filter != "")
-//             query += " WHERE " + filter;
-
-//         if (sort && !_.isEmpty(sort)) query += " ORDER BY " + sort;
-
-//         if (skip >= 0) query += " OFFSET " + skip;
-//         query += " LIMIT " + take;
-
-//         this._client.query(query, (err, result) => {
-//             err = err || null;
-//             if (err) {
-//                 callback(err, null);
-//                 return;
-//             }
-
-//             let items = result.rows;
-
-//             if (items != null)
-//                 this._logger.trace(correlationId, "Retrieved %d from %s", items.length, this._tableName);
-
-//             items = _.map(items, this.convertToPublic);
-
-//             if (pagingEnabled) {
-//                 let query = 'SELECT COUNT(*) AS count FROM ' + this.quoteIdentifier(this._tableName);
-//                 if (filter != null && filter != "")
-//                     query += " WHERE " + filter;
-
-//                 this._client.query(query, (err, result) => {
-//                     err = err || null;
-//                     if (err) {
-//                         callback(err, null);
-//                         return;
-//                     }
-
-//                     let count = result.rows && result.rows.length == 1
-//                         ? LongConverter.toLong(result.rows[0].count) : 0;
-//                     let page = new DataPage<T>(items, count);
-//                     callback(null, page);
-//                 });
-//             } else {
-//                 let page = new DataPage<T>(items);
-//                 callback(null, page);
-//             }
-//         });
-//     }
-
-//    /*
-//      * Gets a number of data items retrieved by a given filter.
-//      *
-//      * This method shall be called by a public getCountByFilter method from child class that
-//      * receives FilterParams and converts them into a filter function.
-//      *
-//      * - correlationId     (optional) transaction id to trace execution through call chain.
-//      * - filter            (optional) a filter JSON object
-//      * - callback          callback function that receives a data page or error.
-//      */
-//     protected getCountByFilter(correlationId: string, filter: any,
-//         callback: (err: any, count: number) => void): void {
-
-//         let query = 'SELECT COUNT(*) AS count FROM ' + this.quoteIdentifier(this._tableName);
-//         if (filter && filter != "")
-//             query += " WHERE " + filter;
-
-//         this._client.query(query, (err, result) => {
-//             err = err || null;
-//             if (err) {
-//                 callback(err, null);
-//                 return;
-//             }
-
-//             let count = result.rows && result.rows.length == 1
-//                 ? LongConverter.toLong(result.rows[0].count) : 0;
-
-//             if (count != null)
-//                 this._logger.trace(correlationId, "Counted %d items in %s", count, this._tableName);
-
-//             callback(null, count);
-//         });
-//     }
-
-//    /*
-//      * Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
-//      *
-//      * This method shall be called by a public getListByFilter method from child class that
-//      * receives FilterParams and converts them into a filter function.
-//      *
-//      * - correlationId    (optional) transaction id to trace execution through call chain.
-//      * - filter           (optional) a filter JSON object
-//      * - paging           (optional) paging parameters
-//      * - sort             (optional) sorting JSON object
-//      * - select           (optional) projection JSON object
-//      * - callback         callback function that receives a data list or error.
-//      */
-//     protected getListByFilter(correlationId: string, filter: any, sort: any, select: any,
-//         callback: (err: any, items: T[]) => void): void {
-
-//         select = select && !_.isEmpty(select) ? select : "*"
-//         let query = "SELECT " + select + " FROM " + this.quoteIdentifier(this._tableName);
-
-//         if (filter && filter != "")
-//             query += " WHERE " + filter;
-
-//         if (sort && !_.isEmpty(sort)) query += " ORDER BY " + sort;
-
-//         this._client.query(query, (err, result) => {
-//             err = err || null;
-//             if (err) {
-//                 callback(err, null);
-//                 return;
-//             }
-
-//             let items = result.rows;
-
-//             if (items != null)
-//                 this._logger.trace(correlationId, "Retrieved %d from %s", items.length, this._tableName);
-
-//             items = _.map(items, this.convertToPublic);
-//             callback(null, items);
-//         });
-//     }
-
-//    /*
-//      * Gets a random item from items that match to a given filter.
-//      *
-//      * This method shall be called by a public getOneRandom method from child class that
-//      * receives FilterParams and converts them into a filter function.
-//      *
-//      * - correlationId     (optional) transaction id to trace execution through call chain.
-//      * - filter            (optional) a filter JSON object
-//      * - callback          callback function that receives a random item or error.
-//      */
-//     protected getOneRandom(correlationId: string, filter: any, callback: (err: any, item: T) => void): void {
-//         let query = 'SELECT COUNT(*) AS count FROM ' + this.quoteIdentifier(this._tableName);
-//         if (filter && filter != "")
-//             query += " WHERE " + filter;
-
-//         this._client.query(query, (err, result) => {
-//             err = err || null;
-//             if (err) {
-//                 callback(err, null);
-//                 return;
-//             }
-
-//             let query = "SELECT * FROM " + this.quoteIdentifier(this._tableName);
-
-//             if (filter && filter != "")
-//                 query += " WHERE " + filter;
-
-//             let count = result.rows && result.rows.length == 1 ? result.rows[0].count : 0;
-//             let pos = _.random(0, count - 1);
-//             query += " OFFSET " + pos + " LIMIT 1";
-
-//             this._client.query(query, (err, result) => {
-//                 err = err || null;
-
-//                 let items = result.rows;
-//                 let item = (items != null && items.length > 0) ? items[0] : null;
-
-//                 if (item == null)
-//                     this._logger.trace(correlationId, "Random item wasn't found from %s", this._tableName);
-//                 else
-//                     this._logger.trace(correlationId, "Retrieved random item from %s", this._tableName);
-
-//                 item = this.convertToPublic(item);
-//                 callback(err, item);
-//             });
-//         });
-//     }
-
-//    /*
-//      * Creates a data item.
-//      *
-//      * - correlation_id    (optional) transaction id to trace execution through call chain.
-//      * - item              an item to be created.
-//      * - callback          (optional) callback function that receives created item or error.
-//      */
-//     public create(correlationId: string, item: T, callback?: (err: any, item: T) => void): void {
-//         if (item == null) {
-//             callback(null, null);
-//             return;
-//         }
-
-//         let row = this.convertFromPublic(item);
-//         let columns = this.generateColumns(row);
-//         let params = this.generateParameters(row);
-//         let values = this.generateValues(row);
-
-//         let query = "INSERT INTO " + this.quoteIdentifier(this._tableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *";
-
-//         this._client.query(query, values, (err, result) => {
-//             err = err || null;
-//             if (!err)
-//                 this._logger.trace(correlationId, "Created in %s with id = %s", this._tableName, row.id);
-
-//             let newItem = result && result.rows && result.rows.length == 1
-//                 ? this.convertToPublic(result.rows[0]) : null;
-//             callback(err, newItem);
-//         });
-//     }
-
-//    /*
-//      * Deletes data items that match to a given filter.
-//      *
-//      * This method shall be called by a public deleteByFilter method from child class that
-//      * receives FilterParams and converts them into a filter function.
-//      *
-//      * - correlationId     (optional) transaction id to trace execution through call chain.
-//      * - filter            (optional) a filter JSON object.
-//      * - callback          (optional) callback function that receives error or null for success.
-//      */
-//     public deleteByFilter(correlationId: string, filter: string, callback?: (err: any) => void): void {
-//         let query = "DELETE FROM " + this.quoteIdentifier(this._tableName);
-//         if (filter != null && filter != "")
-//             query += " WHERE " + filter;
-
-//         this._client.query(query, (err, result) => {
-//             let count = result ? result.rowCount : 0;
-
-//             err = err || null;
-//             if (!err)
-//                 this._logger.trace(correlationId, "Deleted %d items from %s", count, this._tableName);
-
-//             if (callback) callback(err);
-//         });
-//     }
-
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"math/rand"
+	"reflect"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/jackc/pgx/v4/pgxpool"
+	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
+	cconv "github.com/pip-services3-go/pip-services3-commons-go/convert"
+	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
+	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
+	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
+	clog "github.com/pip-services3-go/pip-services3-components-go/log"
+)
+
+/*
+Abstract persistence component that stores data in PostgreSQL using plain driver.
+
+This is the most basic persistence component that is only
+able to store data items of any type. Specific CRUD operations
+over the data items must be implemented in child classes by
+accessing c._db or c._collection properties.
+
+### Configuration parameters ###
+
+- collection:                  (optional) PostgreSQL collection name
+- connection(s):
+  - discovery_key:             (optional) a key to retrieve the connection from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]]
+  - host:                      host name or IP address
+  - port:                      port number (default: 27017)
+  - uri:                       resource URI or connection string with all parameters in it
+- credential(s):
+  - store_key:                 (optional) a key to retrieve the credentials from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/auth.icredentialstore.html ICredentialStore]]
+  - username:                  (optional) user name
+  - password:                  (optional) user password
+- options:
+  - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+  - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+  - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+
+### References ###
+
+- \*:logger:\*:\*:1.0           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]] services
+- \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
+
+### Example ###
+
+    class MyPostgresPersistence extends PostgresPersistence<MyData> {
+
+      func (c * PostgresPersistence) constructor() {
+          base("mydata");
+      }
+
+      func (c * PostgresPersistence) getByName(correlationId: string, name: string, callback: (err, item) => void) {
+        let criteria = { name: name };
+        c._model.findOne(criteria, callback);
+      });
+
+      func (c * PostgresPersistence) set(correlatonId: string, item: MyData, callback: (err) => void) {
+        let criteria = { name: item.name };
+        let options = { upsert: true, new: true };
+        c._model.findOneAndUpdate(criteria, item, options, callback);
+      }
+
+    }
+
+    let persistence = new MyPostgresPersistence();
+    persistence.configure(ConfigParams.fromTuples(
+        "host", "localhost",
+        "port", 27017
+    ));
+
+    persitence.open("123", (err) => {
+         ...
+    });
+
+    persistence.set("123", { name: "ABC" }, (err) => {
+        persistence.getByName("123", "ABC", (err, item) => {
+            console.log(item);                   // Result: { name: "ABC" }
+        });
+    });
+*/
+
+type PostgresPersistence struct {
+	defaultConfig *cconf.ConfigParams
+
+	config          *cconf.ConfigParams
+	references      cref.IReferences
+	opened          bool
+	localConnection bool
+	autoObjects     []string
+
+	//The dependency resolver.
+	DependencyResolver *cref.DependencyResolver
+	//The logger.
+	Logger *clog.CompositeLogger
+	//The PostgreSQL connection component.
+	Connection *PostgresConnection
+	//The PostgreSQL connection pool object.
+	Client *pgxpool.Pool
+	//The PostgreSQL database name.
+	DatabaseName string
+	//The PostgreSQL table object.
+	TableName   string
+	MaxPageSize int
+	Prototype   reflect.Type
+}
+
+// Creates a new instance of the persistence component.
+// - tableName    (optional) a table name.
+func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersistence {
+	c := &PostgresPersistence{
+		defaultConfig: cconf.NewConfigParamsFromTuples(
+			"collection", nil,
+			"dependencies.connection", "*:connection:postgres:*:1.0",
+			"options.max_pool_size", 2,
+			"options.keep_alive", 1,
+			"options.connect_timeout", 5000,
+			"options.auto_reconnect", true,
+			"options.max_page_size", 100,
+			"options.debug", true,
+		),
+		autoObjects: make([]string, 0),
+		Logger:      clog.NewCompositeLogger(),
+		MaxPageSize: 100,
+		Prototype:   proto,
+	}
+	c.DependencyResolver = cref.NewDependencyResolver()
+	c.DependencyResolver.Configure(c.defaultConfig)
+	c.TableName = tableName
+	return c
+}
+
+// Configures component by passing configuration parameters.
+// - config    configuration parameters to be set.
+func (c *PostgresPersistence) Configure(config *cconf.ConfigParams) {
+	config = config.SetDefaults(c.defaultConfig)
+	c.config = config
+
+	c.DependencyResolver.Configure(config)
+
+	c.TableName = config.GetAsStringWithDefault("collection", c.TableName)
+	c.TableName = config.GetAsStringWithDefault("table", c.TableName)
+	c.MaxPageSize = config.GetAsIntegerWithDefault("options.max_page_size", c.MaxPageSize)
+}
+
+// Sets references to dependent components.
+// - references 	references to locate the component dependencies.
+func (c *PostgresPersistence) SetReferences(references cref.IReferences) {
+	c.references = references
+	c.Logger.SetReferences(references)
+
+	// Get connection
+	c.DependencyResolver.SetReferences(references)
+	result := c.DependencyResolver.GetOneOptional("connection")
+	if dep, ok := result.(*PostgresConnection); ok {
+		c.Connection = dep
+	}
+	// Or create a local one
+	if c.Connection == nil {
+		c.Connection = c.createConnection()
+		c.localConnection = true
+	} else {
+		c.localConnection = false
+	}
+}
+
+// Unsets (clears) previously set references to dependent components.
+func (c *PostgresPersistence) UnsetReferences() {
+	c.Connection = nil
+}
+
+func (c *PostgresPersistence) createConnection() *PostgresConnection {
+	connection := NewPostgresConnection()
+	if c.config != nil {
+		connection.Configure(c.config)
+	}
+	if c.references != nil {
+		connection.SetReferences(c.references)
+	}
+	return connection
+}
+
+// Adds index definition to create it on opening
+// - keys index keys (fields)
+// - options index options
+func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, options map[string]string) {
+	builder := "CREATE"
+	if options == nil {
+		options = make(map[string]string, 0)
+	}
+
+	if options["unique"] != "" {
+		builder += " UNIQUE"
+	}
+
+	builder += " INDEX IF NOT EXISTS " + name + " ON " + c.QuoteIdentifier(c.TableName)
+
+	if options["type"] != "" {
+		builder += " " + options["type"]
+	}
+
+	fields := ""
+	for key, _ := range keys {
+		if fields != "" {
+			fields += ", "
+		}
+		fields += c.QuoteIdentifier(key)
+		asc := keys[key]
+		if asc != "" {
+			fields += " DESC"
+		}
+	}
+
+	builder += "(" + fields + ")"
+
+	c.AutoCreateObject(builder)
+}
+
+// Adds index definition to create it on opening
+// - dmlStatement DML statement to autocreate database object
+func (c *PostgresPersistence) AutoCreateObject(dmlStatement string) {
+	c.autoObjects = append(c.autoObjects, dmlStatement)
+}
+
+// Converts object value from internal to func (c * PostgresPersistence) format.
+// - value     an object in internal format to convert.
+// Returns converted object in func (c * PostgresPersistence) format.
+func (c *PostgresPersistence) ConvertToPublic(value interface{}) interface{} {
+	return value
+}
+
+// Convert object value from func (c * PostgresPersistence) to internal format.
+// - value     an object in func (c * PostgresPersistence) format to convert.
+// Returns converted object in internal format.
+func (c *PostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
+	return value
+}
+
+func (c *PostgresPersistence) QuoteIdentifier(value string) string {
+	if value == "" {
+		return value
+	}
+	if value[0] == '\'' {
+		return value
+	}
+	return "'" + value + "'"
+}
+
+// Checks if the component is opened.
+// Returns true if the component has been opened and false otherwise.
+func (c *PostgresPersistence) IsOpen() bool {
+	return c.opened
+}
+
+// Opens the component.
+// - correlationId 	(optional) transaction id to trace execution through call chain.
+// - Returns 			 error or nil no errors occured.
+func (c *PostgresPersistence) open(correlationId string) (err error) {
+	if c.opened {
+		return nil
+	}
+
+	if c.Connection == nil {
+		c.Connection = c.createConnection()
+		c.localConnection = true
+	}
+
+	if c.localConnection {
+		err = c.Connection.Open(correlationId)
+	}
+
+	if err == nil && c.Connection == nil {
+		err = cerr.NewInvalidStateError(correlationId, "NO_CONNECTION", "PostgreSQL connection is missing")
+	}
+
+	if err == nil && !c.Connection.IsOpen() {
+		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "PostgreSQL connection is not opened")
+	}
+
+	c.opened = false
+
+	if err != nil {
+		return err
+	}
+	c.Client = c.Connection.GetConnection()
+	c.DatabaseName = c.Connection.GetDatabaseName()
+
+	// Recreate objects
+	err = c.AutoCreateObjects(correlationId)
+	if err != nil {
+		c.Client = nil
+		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").WithCause(err)
+	} else {
+		c.opened = true
+		c.Logger.Debug(correlationId, "Connected to postgres database %s, collection %s", c.DatabaseName, c.QuoteIdentifier(c.TableName))
+	}
+
+	return err
+
+}
+
+// Closes component and frees used resources.
+// - correlationId 	(optional) transaction id to trace execution through call chain.
+// - Returns 			error or nil no errors occured.
+func (c *PostgresPersistence) Close(correlationId string) (err error) {
+	if !c.opened {
+		return nil
+	}
+
+	if c.Connection == nil {
+		return cerr.NewInvalidStateError(correlationId, "NO_CONNECTION", "Postgres connection is missing")
+	}
+
+	if c.localConnection {
+		err = c.Connection.Close(correlationId)
+	}
+	if err != nil {
+		return err
+	}
+	c.opened = false
+	c.Client = nil
+	return nil
+}
+
+// Clears component state.
+// - correlationId 	(optional) transaction id to trace execution through call chain.
+// - Returns 			error or nil no errors occured.
+func (c *PostgresPersistence) Clear(correlationId string) error {
+	// Return error if collection is not set
+	if c.TableName == "" {
+		return errors.New("Table name is not defined")
+	}
+
+	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
+
+	_, err := c.Client.Query(context.TODO(), query)
+	if err != nil {
+		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").
+			WithCause(err)
+	}
+	return err
+}
+
+func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error) {
+	if c.autoObjects == nil || len(c.autoObjects) == 0 {
+		return nil
+	}
+
+	// Check if table exist to determine weither to auto create objects
+	query := "SELECT to_regclass('" + c.TableName + "')"
+	result, qErr := c.Client.Query(context.TODO(), query)
+	if qErr != nil {
+		return qErr
+	}
+
+	// If table already exists then exit
+	if result != nil {
+		if val, _ := result.Values(); len(val) > 0 { //&& result.rows[0].to_regclass != nil
+			return qErr
+		}
+	}
+	c.Logger.Debug(correlationId, "Table "+c.TableName+" does not exist. Creating database objects...")
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for _, dml := range c.autoObjects {
+			_, err := c.Client.Query(context.TODO(), dml)
+			if err != nil {
+				c.Logger.Error(correlationId, err, "Failed to autocreate database object")
+			}
+
+		}
+	}()
+	wg.Wait()
+	return nil
+}
+
+// Generates a list of column names to use in SQL statements like: "column1,column2,column3"
+// - values an array with column values or a key-value map
+// Returns a generated list of column names
+func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
+
+	result := strings.Builder{}
+	// String arrays
+	if val, ok := values.([]string); ok {
+		for _, item := range val {
+			if result.String() != "" {
+				result.WriteString(",")
+			}
+			result.WriteString(c.QuoteIdentifier(item))
+		}
+		return result.String()
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Array {
+		panic("Values must be string array")
+	}
+
+	if val, ok := values.(map[string]interface{}); ok {
+		for item, _ := range val {
+			if result.String() != "" {
+				result.WriteString(",")
+			}
+			result.WriteString(c.QuoteIdentifier(item))
+		}
+		return result.String()
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Map {
+		panic("Values must be map[string]interface{}")
+	}
+
+	object := reflect.ValueOf(values)
+	if object.Kind() == reflect.Ptr {
+		object = object.Elem()
+	}
+	typ := object.Type()
+	for i := 0; i < object.NumField(); i++ {
+		if result.String() != "" {
+			result.WriteString(",")
+		}
+		result.WriteString(c.QuoteIdentifier(typ.Field(i).Name))
+	}
+	return result.String()
+}
+
+// Generates a list of value parameters to use in SQL statements like: "$1,$2,$3"
+// - values an array with values or a key-value map
+// Returns a generated list of value parameters
+func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
+
+	result := strings.Builder{}
+	// String arrays
+	if val, ok := values.([]string); ok {
+		for index, _ := range val {
+			if result.String() != "" {
+				result.WriteString(",")
+			}
+			result.WriteString("$")
+			result.WriteString(strconv.FormatInt((int64)(index), 16))
+
+		}
+		return result.String()
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Array {
+		panic("Values must be string array")
+	}
+
+	if val, ok := values.(map[string]interface{}); ok {
+
+		for index := 1; index != len(val); index++ {
+			if result.String() != "" {
+				result.WriteString(",")
+			}
+			result.WriteString("$")
+			result.WriteString(strconv.FormatInt((int64)(index), 16))
+
+		}
+		return result.String()
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Map {
+		panic("Values must be map[string]interface{}")
+	}
+
+	object := reflect.ValueOf(values)
+	if object.Kind() == reflect.Ptr {
+		object = object.Elem()
+	}
+	for i := 0; i < object.NumField(); i++ {
+		if result.String() != "" {
+			result.WriteString(",")
+		}
+		result.WriteString("$")
+		result.WriteString(strconv.FormatInt((int64)(i+1), 16))
+	}
+	return result.String()
+}
+
+// Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
+// - values a key-value map with columns and values
+// Returns a generated list of column sets
+// func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
+
+// 	let result = "";
+// 	let index = 1;
+
+// 	for (let column in values) {
+// 	    if (result != "") result += ",";
+// 	    result += c.QuoteIdentifier(column) + "=$" + index;
+// 	    index++;
+// 	}
+// 	return result;
 // }
+
+// Generates a list of column parameters
+// - values a key-value map with columns and values
+// Returns a generated list of column values
+func (c *PostgresPersistence) GenerateValues(values interface{}) []interface{} {
+	results := make([]interface{}, 0, 1)
+
+	if val, ok := values.(map[string]interface{}); ok {
+		for _, item := range val {
+			results = append(results, item)
+		}
+		return results
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Map {
+		panic("Values must be map[string]interface{}")
+	}
+
+	object := reflect.ValueOf(values)
+	if object.Kind() == reflect.Ptr {
+		object = object.Elem()
+	}
+	for i := 0; i < object.NumField(); i++ {
+		results = append(results, object.Field(i).Interface())
+	}
+
+	return results
+}
+
+// Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
+// This method shall be called by a func (c * PostgresPersistence) getPageByFilter method from child class that
+// receives FilterParams and converts them into a filter function.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - filter            (optional) a filter JSON object
+// - paging            (optional) paging parameters
+// - sort              (optional) sorting JSON object
+// - select            (optional) projection JSON object
+// - Returns           receives a data page or error.
+func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter interface{}, paging *cdata.PagingParams,
+	sort interface{}, sel interface{}) (page *cdata.DataPage, err error) {
+
+	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
+	if sel != nil {
+		if slct, ok := sel.(string); ok && slct != "" {
+			query = "SELECT " + slct + " FROM " + c.QuoteIdentifier(c.TableName)
+		}
+	}
+
+	// Adjust max item count based on configurationpaging
+	if paging == nil {
+		paging = cdata.NewEmptyPagingParams()
+	}
+	skip := paging.GetSkip(-1)
+	take := paging.GetTake((int64)(c.MaxPageSize))
+	pagingEnabled := paging.Total
+
+	if filter != nil {
+		if flt, ok := filter.(string); ok && flt != "" {
+			query += " WHERE " + flt
+		}
+	}
+
+	if sort != nil {
+		if srt, ok := sort.(string); ok && srt != "" {
+			query += " ORDER BY " + srt
+		}
+	}
+
+	if skip >= 0 {
+		query += " OFFSET " + strconv.FormatInt(skip, 64)
+	}
+	query += " LIMIT " + strconv.FormatInt(take, 64)
+
+	result, qErr := c.Client.Query(context.TODO(), query)
+
+	if qErr != nil {
+		return nil, qErr
+	}
+
+	items := make([]interface{}, 0, 1)
+	rows, vErr := result.Values()
+	if vErr != nil {
+		return nil, vErr
+	}
+	for _, row := range rows {
+		item := c.ConvertFromMap(row)
+		items = append(items, item)
+	}
+
+	if items != nil {
+		c.Logger.Trace(correlationId, "Retrieved %d from %s", len(items), c.TableName)
+	}
+
+	if pagingEnabled {
+		query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+		if filter != nil {
+			if flt, ok := sel.(string); ok && flt != "" {
+				query += " WHERE " + flt
+			}
+		}
+		result, qErr := c.Client.Query(context.TODO(), query)
+		if qErr != nil {
+			return nil, qErr
+		}
+		var count int64 = 0
+		if result != nil {
+			rows, _ := result.Values()
+			if len(rows) == 1 {
+				if row, ok := rows[0].(map[string]interface{}); ok {
+					count = cconv.LongConverter.ToLong(row["count"])
+				}
+			}
+		}
+		page = cdata.NewDataPage(&count, items)
+		return page, nil
+	}
+	var total int64 = 0
+	page = cdata.NewDataPage(&total, items)
+	return page, nil
+}
+
+// Gets a number of data items retrieved by a given filter.
+// This method shall be called by a func (c * PostgresPersistence) getCountByFilter method from child class that
+// receives FilterParams and converts them into a filter function.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - filter            (optional) a filter JSON object
+// - Returns           data page or error.
+func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter interface{}) (count int64, err error) {
+
+	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+
+	if filter != nil {
+		if flt, ok := filter.(string); ok && flt != "" {
+			query += " WHERE " + flt
+		}
+	}
+
+	result, qErr := c.Client.Query(context.TODO(), query)
+	if qErr != nil {
+		return 0, qErr
+	}
+
+	count = 0
+	if result != nil {
+		rows, _ := result.Values()
+		if len(rows) == 1 {
+			if row, ok := rows[0].(map[string]interface{}); ok {
+				count = cconv.LongConverter.ToLong(row["count"])
+			}
+		}
+	}
+	if count != 0 {
+		c.Logger.Trace(correlationId, "Counted %d items in %s", count, c.TableName)
+	}
+
+	return count, nil
+
+}
+
+// Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
+// This method shall be called by a func (c * PostgresPersistence) getListByFilter method from child class that
+// receives FilterParams and converts them into a filter function.
+// - correlationId    (optional) transaction id to trace execution through call chain.
+// - filter           (optional) a filter JSON object
+// - paging           (optional) paging parameters
+// - sort             (optional) sorting JSON object
+// - select           (optional) projection JSON object
+// - Returns          data list or error.
+func (c *PostgresPersistence) GetListByFilter(correlationId string, filter interface{}, sort interface{}, sel interface{}) (items []interface{}, err error) {
+
+	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
+	if sel != nil {
+		if slct, ok := sel.(string); ok && slct != "" {
+			query = "SELECT " + slct + " FROM " + c.QuoteIdentifier(c.TableName)
+		}
+	}
+
+	if filter != nil {
+		if flt, ok := filter.(string); ok && flt != "" {
+			query += " WHERE " + flt
+		}
+	}
+
+	if sort != nil {
+		if srt, ok := sort.(string); ok && srt != "" {
+			query += " ORDER BY " + srt
+		}
+	}
+
+	result, qErr := c.Client.Query(context.TODO(), query)
+
+	if qErr != nil {
+		return nil, qErr
+	}
+	items = make([]interface{}, 0, 1)
+	rows, vErr := result.Values()
+	if vErr != nil {
+		return nil, vErr
+	}
+	for _, row := range rows {
+		item := c.ConvertFromMap(row)
+		items = append(items, item)
+	}
+
+	if items != nil {
+		c.Logger.Trace(correlationId, "Retrieved %d from %s", len(items), c.TableName)
+	}
+	return items, nil
+
+}
+
+// Gets a random item from items that match to a given filter.
+// This method shall be called by a func (c * PostgresPersistence) getOneRandom method from child class that
+// receives FilterParams and converts them into a filter function.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - filter            (optional) a filter JSON object
+// - Returns            random item or error.
+func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interface{}) (item interface{}, err error) {
+
+	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+
+	if filter != nil {
+		if flt, ok := filter.(string); ok && flt != "" {
+			query += " WHERE " + flt
+		}
+	}
+
+	result, qErr := c.Client.Query(context.TODO(), query)
+	if qErr != nil {
+		return nil, qErr
+	}
+
+	query = "SELECTFROM " + c.QuoteIdentifier(c.TableName)
+
+	if filter != nil {
+		if flt, ok := filter.(string); ok && flt != "" {
+			query += " WHERE " + flt
+		}
+	}
+
+	var count int64 = 0
+	if result != nil {
+		rows, _ := result.Values()
+		if len(rows) == 1 {
+			if row, ok := rows[0].(map[string]interface{}); ok {
+				count = cconv.LongConverter.ToLong(row["count"])
+			}
+		}
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	pos := rand.Int63n(int64(count))
+	query += " OFFSET " + strconv.FormatInt(pos, 10) + " LIMIT 1"
+	result, qErr = c.Client.Query(context.TODO(), query)
+	if qErr != nil {
+		return nil, qErr
+	}
+	rows, vErr := result.Values()
+	if vErr == nil && len(rows) > 0 {
+		item := c.ConvertFromMap(rows[0])
+		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
+		return item, nil
+	}
+	c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
+	return nil, vErr
+}
+
+// Creates a data item.
+// - correlation_id    (optional) transaction id to trace execution through call chain.
+// - item              an item to be created.
+// - Returns          (optional) callback function that receives created item or error.
+func (c *PostgresPersistence) Create(correlationId string, item interface{}) (result interface{}, err error) {
+
+	if item == nil {
+		return nil, nil
+	}
+
+	row := c.ConvertFromPublic(item)
+	columns := c.GenerateColumns(row)
+	params := c.GenerateParameters(row)
+	values := c.GenerateValues(row)
+	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
+	results, qErr := c.Client.Query(context.TODO(), query, values)
+
+	if qErr == nil {
+		rows, vErr := results.Values()
+		if vErr != nil {
+			return nil, vErr
+		}
+		if len(rows) > 0 {
+			item := c.ConvertFromMap(rows[0])
+			return item, nil
+		}
+		if row, ok := rows[0].(map[string]interface{}); ok {
+			c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, row["id"])
+		}
+	}
+	return nil, qErr
+}
+
+// Deletes data items that match to a given filter.
+// This method shall be called by a func (c * PostgresPersistence) deleteByFilter method from child class that
+// receives FilterParams and converts them into a filter function.
+// - correlationId     (optional) transaction id to trace execution through call chain.
+// - filter            (optional) a filter JSON object.
+// - Returns           error or nil for success.
+func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string) (err error) {
+	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
+	if filter != "" {
+		query += " WHERE " + filter
+	}
+
+	result, qErr := c.Client.Query(context.TODO(), query)
+
+	if qErr == nil {
+		var count int64 = 0
+		if result != nil {
+			rows, _ := result.Values()
+			if len(rows) == 1 {
+				if row, ok := rows[0].(map[string]interface{}); ok {
+					count = cconv.LongConverter.ToLong(row["rowCount"])
+				}
+			}
+		}
+		c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
+	}
+	return qErr
+}
+
+// service function for return pointer on new prototype object for unmarshaling
+func (c *PostgresPersistence) NewObjectByPrototype() reflect.Value {
+	proto := c.Prototype
+	if proto.Kind() == reflect.Ptr {
+		proto = proto.Elem()
+	}
+	return reflect.New(proto)
+}
+
+func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) interface{} {
+	item := docPointer.Elem().Interface()
+	if c.Prototype.Kind() == reflect.Ptr {
+		return docPointer.Interface()
+	}
+	return item
+}
+
+// ConvertFromMap method are converts from map[string]interface{} to object, defined by c.Prototype
+func (c *PostgresPersistence) ConvertFromMap(buf interface{}) interface{} {
+	docPointer := c.NewObjectByPrototype()
+	jsonBuf, _ := json.Marshal(buf)
+	json.Unmarshal(jsonBuf, docPointer.Interface())
+	return c.ConvertResultToPublic(docPointer)
+}

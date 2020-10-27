@@ -14,7 +14,7 @@ func TestPostgresConnectionResolver(t *testing.T) {
 		"connection.host", "localhost",
 		"connection.port", 5432,
 		"connection.database", "test",
-		"connection.ssl", true,
+		"connection.sslmode", "verify-ca",
 		"credential.username", "postgres",
 		"credential.password", "postgres",
 	)
@@ -26,9 +26,6 @@ func TestPostgresConnectionResolver(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.NotNil(t, config)
-	assert.Equal(t, "localhost", config.Host)
-	assert.Equal(t, (uint16)(5432), config.Port)
-	assert.Equal(t, "test", config.Database)
-	assert.Equal(t, "postgres", config.User)
-	assert.Equal(t, "postgres", config.Password)
+	assert.Equal(t, "postgres://postgres:postgres@localhost:5432/test?sslmode=verify-ca", config)
+
 }
