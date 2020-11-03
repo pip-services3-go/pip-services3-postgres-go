@@ -70,6 +70,13 @@ func TestDummyMapPostgresPersistence(t *testing.T) {
 	}
 
 	t.Run("DummyMapPostgresPersistence:CRUD", fixture.TestCrudOperations)
+
+	opnErr = persistence.Clear("")
+	if opnErr != nil {
+		t.Error("Error cleaned persistence", opnErr)
+		return
+	}
+
 	t.Run("DummyMapPostgresPersistence:Batch", fixture.TestBatchOperations)
 
 }

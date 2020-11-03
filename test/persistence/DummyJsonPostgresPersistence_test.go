@@ -69,6 +69,13 @@ func TestDummyJsonPostgresPersistence(t *testing.T) {
 	}
 
 	t.Run("DummyPostgresConnection:CRUD", fixture.TestCrudOperations)
+
+	opnErr = persistence.Clear("")
+	if opnErr != nil {
+		t.Error("Error cleaned persistence", opnErr)
+		return
+	}
+
 	t.Run("DummyPostgresConnection:Batch", fixture.TestBatchOperations)
 
 }

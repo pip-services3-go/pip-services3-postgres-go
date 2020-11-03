@@ -18,7 +18,7 @@ func NewDummyPostgresPersistence() *DummyPostgresPersistence {
 		IdentifiablePostgresPersistence: *ppersist.NewIdentifiablePostgresPersistence(proto, "dummies"),
 	}
 	// Row name must be in double quotes for properly case!!!
-	c.AutoCreateObject("CREATE TABLE dummies (\"Id\" TEXT PRIMARY KEY, \"Key\" TEXT, \"Content\" TEXT)")
+	c.AutoCreateObject("CREATE TABLE dummies (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
 	c.EnsureIndex("dummies_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
 	return c
 }

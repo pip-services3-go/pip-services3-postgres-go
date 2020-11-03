@@ -136,7 +136,7 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 	}
 
 	query := "CREATE TABLE IF NOT EXISTS " + c.QuoteIdentifier(c.TableName) +
-		" (\"Id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")"
+		" (\"id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")"
 	c.AutoCreateObject(query)
 }
 
@@ -167,7 +167,7 @@ func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublic(value interface{
 	id := cmpersist.GetObjectId(value)
 
 	result := map[string]interface{}{
-		"Id":   id,
+		"id":   id,
 		"data": value,
 	}
 	return result
@@ -191,7 +191,7 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 		return nil, nil
 	}
 
-	query := "UPDATE " + c.QuoteIdentifier(c.TableName) + " SET \"data\"=\"data\"||$2 WHERE \"Id\"=$1 RETURNING *"
+	query := "UPDATE " + c.QuoteIdentifier(c.TableName) + " SET \"data\"=\"data\"||$2 WHERE \"id\"=$1 RETURNING *"
 	values := []interface{}{id, data.Value()}
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)

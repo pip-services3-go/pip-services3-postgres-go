@@ -69,6 +69,13 @@ func TestDummyRefPostgresPersistence(t *testing.T) {
 	}
 
 	t.Run("DummyRefPostgresPersistence:CRUD", fixture.TestCrudOperations)
+
+	opnErr = persistence.Clear("")
+	if opnErr != nil {
+		t.Error("Error cleaned persistence", opnErr)
+		return
+	}
+
 	t.Run("DummyRefPostgresPersistence:Batch", fixture.TestBatchOperations)
 
 }

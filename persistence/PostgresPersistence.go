@@ -406,48 +406,19 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 // Returns a generated list of column names
 func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 
+	items := c.convertToMap(values)
+	if items == nil {
+		return ""
+	}
 	result := strings.Builder{}
-	// String arrays
-	if val, ok := values.([]interface{}); ok {
-		for _, item := range val {
-			if result.String() != "" {
-				result.WriteString(",")
-			}
-			result.WriteString(c.QuoteIdentifier(item.(string)))
-		}
-		return result.String()
-	}
-
-	if reflect.TypeOf(values).Kind() == reflect.Array {
-		panic("Values must be string array")
-	}
-
-	if val, ok := values.(map[string]interface{}); ok {
-		for item, _ := range val {
-			if result.String() != "" {
-				result.WriteString(",")
-			}
-			result.WriteString(c.QuoteIdentifier(item))
-		}
-		return result.String()
-	}
-
-	if reflect.TypeOf(values).Kind() == reflect.Map {
-		panic("Values must be map[string]interface{}")
-	}
-
-	object := reflect.ValueOf(values)
-	if object.Kind() == reflect.Ptr {
-		object = object.Elem()
-	}
-	typ := object.Type()
-	for i := 0; i < object.NumField(); i++ {
+	for item := range items {
 		if result.String() != "" {
 			result.WriteString(",")
 		}
-		result.WriteString(c.QuoteIdentifier(typ.Field(i).Name))
+		result.WriteString(c.QuoteIdentifier(item))
 	}
 	return result.String()
+
 }
 
 // Generates a list of value parameters to use in SQL statements like: "$1,$2,$3"
@@ -455,34 +426,26 @@ func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 // Returns a generated list of value parameters
 func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 
+	result := strings.Builder{}
 	// String arrays
 	if val, ok := values.([]interface{}); ok {
-		return c.generateParamString(len(val))
+		for index := 1; index <= len(val); index++ {
+			if result.String() != "" {
+				result.WriteString(",")
+			}
+			result.WriteString("$")
+			result.WriteString(strconv.FormatInt((int64)(index), 16))
+		}
+
+		return result.String()
 	}
 
-	if reflect.TypeOf(values).Kind() == reflect.Array {
-		panic("Values must be string array")
+	items := c.convertToMap(values)
+	if items == nil {
+		return ""
 	}
 
-	if val, ok := values.(map[string]interface{}); ok {
-		return c.generateParamString(len(val))
-	}
-
-	if reflect.TypeOf(values).Kind() == reflect.Map {
-		panic("Values must be map[string]interface{}")
-	}
-
-	object := reflect.ValueOf(values)
-	if object.Kind() == reflect.Ptr {
-		object = object.Elem()
-	}
-	return c.generateParamString(object.NumField())
-
-}
-
-func (c *PostgresPersistence) generateParamString(paramNum int) string {
-	result := strings.Builder{}
-	for index := 1; index <= paramNum; index++ {
+	for index := 1; index <= len(items); index++ {
 		if result.String() != "" {
 			result.WriteString(",")
 		}
@@ -498,58 +461,23 @@ func (c *PostgresPersistence) generateParamString(paramNum int) string {
 // Returns a generated list of column sets
 func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params string, columns string) {
 
+	items := c.convertToMap(values)
+	if items == nil {
+		return "", ""
+	}
 	result := strings.Builder{}
 	col := strings.Builder{}
-	// String arrays
-	if val, ok := values.([]interface{}); ok {
-		for index, column := range val {
-			if result.String() != "" {
-				result.WriteString(",")
-				col.WriteString(",")
-			}
-			result.WriteString(c.QuoteIdentifier(column.(string)) + "=$" + strconv.FormatInt((int64)(index+1), 16))
-			col.WriteString(c.QuoteIdentifier(column.(string)))
-		}
-		return result.String(), col.String()
-	}
-
-	if reflect.TypeOf(values).Kind() == reflect.Array {
-		panic("Values must be string array")
-	}
-
-	if val, ok := values.(map[string]interface{}); ok {
-		index := 1
-		for item, _ := range val {
-			if result.String() != "" {
-				result.WriteString(",")
-				col.WriteString(",")
-			}
-			result.WriteString(c.QuoteIdentifier(item) + "=$" + strconv.FormatInt((int64)(index), 16))
-			col.WriteString(c.QuoteIdentifier(item))
-			index++
-		}
-		return result.String(), col.String()
-	}
-
-	if reflect.TypeOf(values).Kind() == reflect.Map {
-		panic("Values must be map[string]interface{}")
-	}
-
-	object := reflect.ValueOf(values)
-	if object.Kind() == reflect.Ptr {
-		object = object.Elem()
-	}
-	typ := object.Type()
-	for i := 0; i < object.NumField(); i++ {
+	index := 1
+	for column := range items {
 		if result.String() != "" {
 			result.WriteString(",")
 			col.WriteString(",")
 		}
-		result.WriteString(c.QuoteIdentifier(typ.Field(i).Name) + "=$" + strconv.FormatInt((int64)(i+1), 16))
-		col.WriteString(c.QuoteIdentifier(typ.Field(i).Name))
+		result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
+		col.WriteString(c.QuoteIdentifier(column))
+		index++
 	}
 	return result.String(), col.String()
-
 }
 
 // Generates a list of column parameters
@@ -558,32 +486,35 @@ func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params 
 func (c *PostgresPersistence) GenerateValues(columns string, values interface{}) []interface{} {
 	results := make([]interface{}, 0, 1)
 
-	if val, ok := values.(map[string]interface{}); ok {
-
-		if columns == "" {
-			panic("GenerateValues: Columns must be set for properly convert from map")
-		}
-
-		columnNames := strings.Split(strings.ReplaceAll(columns, "\"", ""), ",")
-		for _, item := range columnNames {
-			results = append(results, val[item])
-		}
-		return results
+	items := c.convertToMap(values)
+	if items == nil {
+		return nil
 	}
 
-	if reflect.TypeOf(values).Kind() == reflect.Map {
-		panic("Values must be map[string]interface{}")
+	if columns == "" {
+		panic("GenerateValues: Columns must be set for properly convert")
 	}
 
-	object := reflect.ValueOf(values)
-	if object.Kind() == reflect.Ptr {
-		object = object.Elem()
+	columnNames := strings.Split(strings.ReplaceAll(columns, "\"", ""), ",")
+	for _, item := range columnNames {
+		results = append(results, items[item])
 	}
-	for i := 0; i < object.NumField(); i++ {
-		results = append(results, object.Field(i).Interface())
-	}
-
 	return results
+}
+
+func (c *PostgresPersistence) convertToMap(values interface{}) map[string]interface{} {
+	mRes, mErr := json.Marshal(values)
+	if mErr != nil {
+		c.Logger.Error("PostgresPersistence", mErr, "Error data convertion")
+		return nil
+	}
+	items := make(map[string]interface{}, 0)
+	mErr = json.Unmarshal(mRes, &items)
+	if mErr != nil {
+		c.Logger.Error("PostgresPersistence", mErr, "Error data convertion")
+		return nil
+	}
+	return items
 }
 
 // Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
@@ -837,15 +768,15 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(columns, row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
-	results, qErr := c.Client.Query(context.TODO(), query, values...)
+	qResults, qErr := c.Client.Query(context.TODO(), query, values...)
 
-	if qErr == nil && results.Next() {
-		rows, vErr := results.Values()
+	if qErr == nil && qResults.Next() {
+		rows, vErr := qResults.Values()
 		if vErr != nil {
 			return nil, vErr
 		}
 
-		item := c.ConvertFromRows(results.FieldDescriptions(), rows)
+		item := c.ConvertFromRows(qResults.FieldDescriptions(), rows)
 		id := cmpersist.GetObjectId(item)
 		c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
 		return item, nil
