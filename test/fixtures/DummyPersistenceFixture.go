@@ -52,12 +52,11 @@ func (c *DummyPersistenceFixture) TestCrudOperations(t *testing.T) {
 	}
 	assert.NotNil(t, page)
 	assert.Len(t, page.Data, 2)
-	//Testing default sorting by Key field len
 
 	item1 := page.Data[0]
-	assert.Equal(t, item1.Key, dummy2.Key) // dummy2
+	assert.Equal(t, item1.Key, dummy1.Key)
 	item2 := page.Data[1]
-	assert.Equal(t, item2.Key, dummy1.Key) // dummy1
+	assert.Equal(t, item2.Key, dummy2.Key)
 
 	// Update the dummy
 	dummy1.Content = "Updated Content 1"
@@ -71,7 +70,7 @@ func (c *DummyPersistenceFixture) TestCrudOperations(t *testing.T) {
 	assert.Equal(t, dummy1.Content, result.Content)
 
 	// Partially update the dummy
-	updateMap := cdata.NewAnyValueMapFromTuples("content", "Partially Updated Content 1")
+	updateMap := cdata.NewAnyValueMapFromTuples("Content", "Partially Updated Content 1")
 	result, err = c.persistence.UpdatePartially("", dummy1.Id, updateMap)
 	if err != nil {
 		t.Errorf("UpdatePartially method error %v", err)

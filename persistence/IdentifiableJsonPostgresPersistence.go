@@ -1,5 +1,13 @@
 package persistence
 
+import (
+	"context"
+	"reflect"
+
+	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
+	cmpersist "github.com/pip-services3-go/pip-services3-data-go/persistence"
+)
+
 ///* @module persistence */
 ///* @hidden */
 // const _ = require('lodash');
@@ -22,7 +30,7 @@ package persistence
 //  * All other operations can be used out of the box.
 //  *
 //  * In complex scenarios child classes can implement additional operations by
-//  * accessing this._collection and this._model properties.
+//  * accessing c._collection and c._model properties.
 
 //  * ### Configuration parameters ###
 //  *
@@ -66,7 +74,7 @@ package persistence
 //  *
 //  *     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
 //  *         callback: (err: any, page: DataPage<MyData>) => void): void {
-//  *         base.getPageByFilter(correlationId, this.composeFilter(filter), paging, null, null, callback);
+//  *         base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
 //  *     }
 //  *
 //  *     }
@@ -96,83 +104,109 @@ package persistence
 //  *         )
 //  *     });
 //  */
-// export class IdentifiableJsonPostgresPersistence<T extends IIdentifiable<K>, K> extends IdentifiablePostgresPersistence<T, K> {
-//    /*
-//      * Creates a new instance of the persistence component.
-//      *
-//      * - collection    (optional) a collection name.
-//      */
-//     public constructor(tableName: string) {
-//         super(tableName);
-//     }
+type IdentifiableJsonPostgresPersistence struct {
+	IdentifiablePostgresPersistence
+}
 
-//    /*
-//      * Adds DML statement to automatically create JSON(B) table
-//      *
-//      * - idType type of the id column (default: TEXT)
-//      * - dataType type of the data column (default: JSONB)
-//      */
-//     protected ensureTable(idType: string = 'TEXT', dataType: string = 'JSONB') {
-//         let query = "CREATE TABLE IF NOT EXISTS " + this.quoteIdentifier(this._tableName)
-//             + " (\"id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")";
-//         this.autoCreateObject(query);
-//     }
+/*
+ * Creates a new instance of the persistence component.
+ *
+ * - collection    (optional) a collection name.
+ */
+func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string) *IdentifiableJsonPostgresPersistence {
+	c := &IdentifiableJsonPostgresPersistence{
+		IdentifiablePostgresPersistence: *NewIdentifiablePostgresPersistence(proto, tableName),
+	}
+	return c
+}
 
-//    /*
-//      * Converts object value from internal to public format.
-//      *
-//      * - value     an object in internal format to convert.
-//      * Returns converted object in public format.
-//      */
-//     protected convertToPublic(value: any): any {
-//         if (value == null) return null;
-//          return value.data;
-//     }
+/*
+ * Adds DML statement to automatically create JSON(B) table
+ *
+ * - idType type of the id column (default: TEXT)
+ * - dataType type of the data column (default: JSONB)
+ */
+func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataType string) {
+	if idType == "" {
+		idType = "TEXT"
+	}
+	if dataType == "" {
+		dataType = "JSONB"
+	}
 
-//    /*
-//      * Convert object value from public to internal format.
-//      *
-//      * - value     an object in public format to convert.
-//      * Returns converted object in internal format.
-//      */
-//     protected convertFromPublic(value: any): any {
-//         if (value == null) return null;
-//         let result: any = {
-//             id: value.id,
-//             data: value
-//         };
-//         return result;
-//     }
+	query := "CREATE TABLE IF NOT EXISTS " + c.QuoteIdentifier(c.TableName) +
+		" (\"Id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")"
+	c.AutoCreateObject(query)
+}
 
-//    /*
-//      * Updates only few selected fields in a data item.
-//      *
-//      * - correlation_id    (optional) transaction id to trace execution through call chain.
-//      * - id                an id of data item to be updated.
-//      * - data              a map with fields to be updated.
-//      * - callback          callback function that receives updated item or error.
-//      */
-//     public updatePartially(correlationId: string, id: K, data: AnyValueMap,
-//         callback?: (err: any, item: T) => void): void {
+/*
+ * Converts object value from internal to public format.
+ *
+ * - value     an object in internal format to convert.
+ * Returns converted object in public format.
+ */
+func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(value interface{}) interface{} {
+	if value == nil {
+		return nil
+	}
+	val, ok := value.(map[string]interface{})
+	if ok {
+		return val["data"]
+	}
+	return value
+}
 
-//         if (data == null || id == null) {
-//             if (callback) callback(null, null);
-//             return;
-//         }
+/*
+ * Convert object value from public to internal format.
+ *
+ * - value     an object in public format to convert.
+ * Returns converted object in internal format.
+ */
+func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
+	if value == nil {
+		return nil
+	}
+	id := cmpersist.GetObjectId(value)
 
-//         let query = "UPDATE " + this.quoteIdentifier(this._tableName) + " SET \"data\"=\"data\"||$2 WHERE \"id\"=$1 RETURNING *";
-//         let values = [id, data.getAsObject()];
+	result := map[string]interface{}{
+		"id":   id,
+		"data": value,
+	}
+	return result
+}
 
-//         this._client.query(query, values, (err, result) => {
-//             err = err || null;
-//             if (!err)
-//                 this._logger.trace(correlationId, "Updated partially in %s with id = %s", this._tableName, id);
+/*
+ * Updates only few selected fields in a data item.
+ *
+ * - correlation_id    (optional) transaction id to trace execution through call chain.
+ * - id                an id of data item to be updated.
+ * - data              a map with fields to be updated.
+ * Returns          callback function that receives updated item or error.
+ */
+func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error) {
 
-//             let newItem = result && result.rows && result.rows.length == 1
-//                 ? this.convertToPublic(result.rows[0]) : null;
+	if data == nil { //|| id == null) {
+		return nil, nil
+	}
 
-//             if (callback) callback(err, newItem);
-//         });
-//     }
+	query := "UPDATE " + c.QuoteIdentifier(c.TableName) + " SET \"data\"=\"data\"||$2 WHERE \"Id\"=$1 RETURNING *"
+	values := []interface{}{id, data.Value()}
 
-// }
+	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
+
+	if qErr != nil {
+		return nil, qErr
+	}
+
+	if qResult.Next() {
+		rows, vErr := qResult.Values()
+		if vErr == nil && len(rows) > 0 {
+			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+			c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
+			return result, nil
+		}
+		return vErr, nil
+	}
+	return nil, nil
+
+}

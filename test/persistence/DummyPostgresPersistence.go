@@ -1,44 +1,133 @@
 package test
 
-// import { FilterParams } from 'pip-services3-commons-node';
-// import { PagingParams } from 'pip-services3-commons-node';
-// import { DataPage } from 'pip-services3-commons-node';
+import (
+	"reflect"
 
-// import { IdentifiablePostgresPersistence } from '../../src/persistence/IdentifiablePostgresPersistence';
-// import { Dummy } from '../fixtures/Dummy';
-// import { IDummyPersistence } from '../fixtures/IDummyPersistence';
+	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
+	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
+)
 
-// export class DummyPostgresPersistence
-//     extends IdentifiablePostgresPersistence<Dummy, string>
-//     implements IDummyPersistence
-// {
-//     public constructor() {
-//         super('dummies');
-//         this.autoCreateObject('CREATE TABLE dummies (id TEXT PRIMARY KEY, key TEXT, content TEXT)');
-//         this.ensureIndex('dummies_key', { key: 1 }, { unique: true });
-//     }
+type DummyPostgresPersistence struct {
+	ppersist.IdentifiablePostgresPersistence
+}
 
-//     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
-//         callback: (err: any, page: DataPage<Dummy>) => void): void {
-//         filter = filter || new FilterParams();
-//         let key = filter.getAsNullableString('key');
+func NewDummyPostgresPersistence() *DummyPostgresPersistence {
+	proto := reflect.TypeOf(tf.Dummy{})
+	c := &DummyPostgresPersistence{
+		IdentifiablePostgresPersistence: *ppersist.NewIdentifiablePostgresPersistence(proto, "dummies"),
+	}
+	// Row name must be in double quotes for properly case!!!
+	c.AutoCreateObject("CREATE TABLE dummies (\"Id\" TEXT PRIMARY KEY, \"Key\" TEXT, \"Content\" TEXT)")
+	c.EnsureIndex("dummies_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
+	return c
+}
 
-//         let filterCondition: string = "";
-//         if (key != null)
-//             filterCondition += "key='" + key + "'";
+func (c *DummyPostgresPersistence) Create(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
+	value, err := c.IdentifiablePostgresPersistence.Create(correlationId, item)
 
-//         super.getPageByFilter(correlationId, filterCondition, paging, null, null, callback);
-//     }
+	if value != nil {
+		val, _ := value.(tf.Dummy)
+		result = val
+	}
+	return result, err
+}
 
-//     public getCountByFilter(correlationId: string, filter: FilterParams,
-//         callback: (err: any, count: number) => void): void {
-//         filter = filter || new FilterParams();
-//         let key = filter.getAsNullableString('key');
+func (c *DummyPostgresPersistence) GetListByIds(correlationId string, ids []string) (items []tf.Dummy, err error) {
+	convIds := make([]interface{}, len(ids))
+	for i, v := range ids {
+		convIds[i] = v
+	}
+	result, err := c.IdentifiablePostgresPersistence.GetListByIds(correlationId, convIds)
+	items = make([]tf.Dummy, len(result))
+	for i, v := range result {
+		val, _ := v.(tf.Dummy)
+		items[i] = val
+	}
+	return items, err
+}
 
-//         let filterCondition: string = "";
-//         if (key != null)
-//             filterCondition += "key='" + key + "'";
+func (c *DummyPostgresPersistence) GetOneById(correlationId string, id string) (item tf.Dummy, err error) {
+	result, err := c.IdentifiablePostgresPersistence.GetOneById(correlationId, id)
+	if result != nil {
+		val, _ := result.(tf.Dummy)
+		item = val
+	}
+	return item, err
+}
 
-//         super.getCountByFilter(correlationId, filterCondition, callback);
-//     }
-// }
+func (c *DummyPostgresPersistence) Update(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
+	value, err := c.IdentifiablePostgresPersistence.Update(correlationId, item)
+	if value != nil {
+		val, _ := value.(tf.Dummy)
+		result = val
+	}
+	return result, err
+}
+
+func (c *DummyPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item tf.Dummy, err error) {
+	result, err := c.IdentifiablePostgresPersistence.UpdatePartially(correlationId, id, data)
+
+	if result != nil {
+		val, _ := result.(tf.Dummy)
+		item = val
+	}
+	return item, err
+}
+
+func (c *DummyPostgresPersistence) DeleteById(correlationId string, id string) (item tf.Dummy, err error) {
+	result, err := c.IdentifiablePostgresPersistence.DeleteById(correlationId, id)
+	if result != nil {
+		val, _ := result.(tf.Dummy)
+		item = val
+	}
+	return item, err
+}
+
+func (c *DummyPostgresPersistence) DeleteByIds(correlationId string, ids []string) (err error) {
+	convIds := make([]interface{}, len(ids))
+	for i, v := range ids {
+		convIds[i] = v
+	}
+	return c.IdentifiablePostgresPersistence.DeleteByIds(correlationId, convIds)
+}
+
+func (c *DummyPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.DummyPage, err error) {
+
+	if &filter == nil {
+		filter = cdata.NewEmptyFilterParams()
+	}
+
+	key := filter.GetAsNullableString("Key")
+	filterObj := ""
+	if key != nil && *key != "" {
+		filterObj += "key='" + *key + "'"
+	}
+	sorting := ""
+
+	tempPage, err := c.IdentifiablePostgresPersistence.GetPageByFilter(correlationId,
+		filterObj, paging,
+		sorting, nil)
+	// Convert to DummyPage
+	dataLen := int64(len(tempPage.Data)) // For full release tempPage and delete this by GC
+	data := make([]tf.Dummy, dataLen)
+	for i, v := range tempPage.Data {
+		data[i] = v.(tf.Dummy)
+	}
+	page = tf.NewDummyPage(&dataLen, data)
+	return page, err
+}
+
+func (c *DummyPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error) {
+
+	if &filter == nil {
+		filter = cdata.NewEmptyFilterParams()
+	}
+
+	key := filter.GetAsNullableString("Key")
+	filterObj := ""
+	if key != nil && *key != "" {
+		filterObj += "key='" + *key + "'"
+	}
+	return c.IdentifiablePostgresPersistence.GetCountByFilter(correlationId, filterObj)
+}

@@ -8,10 +8,10 @@ import (
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 )
 
-func TestDummyPostgresPersistence(t *testing.T) {
+func TestDummyMapPostgresPersistence(t *testing.T) {
 
-	var persistence *DummyPostgresPersistence
-	var fixture tf.DummyPersistenceFixture
+	var persistence *DummyMapPostgresPersistence
+	var fixture tf.DummyMapPersistenceFixture
 
 	postgresUri := os.Getenv("POSTGRES_URI")
 	postgresHost := os.Getenv("POSTGRES_HOST")
@@ -51,9 +51,10 @@ func TestDummyPostgresPersistence(t *testing.T) {
 		"credential.password", postgresPassword,
 	)
 
-	persistence = NewDummyPostgresPersistence()
-	fixture = *tf.NewDummyPersistenceFixture(persistence)
+	persistence = NewDummyMapPostgresPersistence()
 	persistence.Configure(dbConfig)
+
+	fixture = *tf.NewDummyMapPersistenceFixture(persistence)
 
 	opnErr := persistence.Open("")
 	if opnErr != nil {
@@ -68,7 +69,7 @@ func TestDummyPostgresPersistence(t *testing.T) {
 		return
 	}
 
-	t.Run("DummyPostgresConnection:CRUD", fixture.TestCrudOperations)
-	t.Run("DummyPostgresConnection:Batch", fixture.TestBatchOperations)
+	t.Run("DummyMapPostgresPersistence:CRUD", fixture.TestCrudOperations)
+	t.Run("DummyMapPostgresPersistence:Batch", fixture.TestBatchOperations)
 
 }

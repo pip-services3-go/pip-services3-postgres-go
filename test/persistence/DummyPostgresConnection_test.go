@@ -1,86 +1,97 @@
 package test
 
-// const process = require('process');
-// const assert = require('chai').assert;
+import (
+	"os"
+	"testing"
 
-// import { ConfigParams } from 'pip-services3-commons-node';
-// import { Descriptor } from 'pip-services3-commons-node';
-// import { References } from 'pip-services3-commons-node';
-// import { PostgresConnection } from '../../src/persistence/PostgresConnection';
-// import { DummyPersistenceFixture } from '../fixtures/DummyPersistenceFixture';
-// import { DummyPostgresPersistence } from './DummyPostgresPersistence';
+	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
+	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
+	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
+	"github.com/stretchr/testify/assert"
+)
 
-// suite('DummyPostgresConnection', ()=> {
-//     let connection: PostgresConnection;
-//     let persistence: DummyPostgresPersistence;
-//     let fixture: DummyPersistenceFixture;
+func TestDummyPostgresConnection(t *testing.T) {
 
-//     let postgresUri = process.env['POSTGRES_URI'];
-//     let postgresHost = process.env['POSTGRES_HOST'] || 'localhost';
-//     let postgresPort = process.env['POSTGRES_PORT'] || 5432;
-//     let postgresDatabase = process.env['POSTGRES_DB'] || 'test';
-//     let postgresUser = process.env['POSTGRES_USER'] || 'postgres';
-//     let postgresPassword = process.env['POSTGRES_PASSWORD'] || 'postgres';
-//     if (postgresUri == null && postgresHost == null)
-//         return;
+	var persistence *DummyPostgresPersistence
+	var fixture tf.DummyPersistenceFixture
+	var connection *ppersist.PostgresConnection
 
-//     setup((done) => {
-//         let dbConfig = ConfigParams.fromTuples(
-//             'connection.uri', postgresUri,
-//             'connection.host', postgresHost,
-//             'connection.port', postgresPort,
-//             'connection.database', postgresDatabase,
-//             'credential.username', postgresUser,
-//             'credential.password', postgresPassword
-//         );
+	postgresUri := os.Getenv("POSTGRES_URI")
+	postgresHost := os.Getenv("POSTGRES_HOST")
+	if postgresHost == "" {
+		postgresHost = "localhost"
+	}
 
-//         connection = new PostgresConnection();
-//         connection.configure(dbConfig);
+	postgresPort := os.Getenv("POSTGRES_PORT")
+	if postgresPort == "" {
+		postgresPort = "5432"
+	}
 
-//         persistence = new DummyPostgresPersistence();
-//         persistence.setReferences(References.fromTuples(
-//             new Descriptor("pip-services", "connection", "postgres", "default", "1.0"), connection
-//         ));
+	postgresDatabase := os.Getenv("POSTGRES_DB")
+	if postgresDatabase == "" {
+		postgresDatabase = "test"
+	}
 
-//         fixture = new DummyPersistenceFixture(persistence);
+	postgresUser := os.Getenv("POSTGRES_USER")
+	if postgresUser == "" {
+		postgresUser = "postgres"
+	}
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	if postgresPassword == "" {
+		postgresPassword = "postgres"
+	}
 
-//         connection.open(null, (err: any) => {
-//             if (err) {
-//                 done(err);
-//                 return;
-//             }
+	if postgresUri == "" && postgresHost == "" {
+		panic("Connection params not set")
+	}
 
-//             persistence.open(null, (err: any) => {
-//                 if (err) {
-//                     done(err);
-//                     return;
-//                 }
+	dbConfig := cconf.NewConfigParamsFromTuples(
+		"connection.uri", postgresUri,
+		"connection.host", postgresHost,
+		"connection.port", postgresPort,
+		"connection.database", postgresDatabase,
+		"credential.username", postgresUser,
+		"credential.password", postgresPassword,
+	)
 
-//                 persistence.clear(null, (err) => {
-//                     done(err);
-//                 });
-//             });
-//         });
-//     });
+	connection = ppersist.NewPostgresConnection()
+	connection.Configure(dbConfig)
 
-//     teardown((done) => {
-//         connection.close(null, (err) => {
-//             persistence.close(null, done);
-//         });
-//     });
+	persistence = NewDummyPostgresPersistence()
+	descr := cref.NewDescriptor("pip-services", "connection", "postgres", "default", "1.0")
+	ref := cref.NewReferencesFromTuples(descr, connection)
+	persistence.SetReferences(ref)
 
-//     test('Connection', (done) => {
-//         assert.isObject(connection.getConnection());
-//         assert.isString(connection.getDatabaseName());
+	fixture = *tf.NewDummyPersistenceFixture(persistence)
 
-//         done();
-//     });
+	opnErr := connection.Open("")
+	if opnErr != nil {
+		t.Error("Error opened connection", opnErr)
+		return
+	}
+	defer connection.Close("")
 
-//     test('Crud Operations', (done) => {
-//         fixture.testCrudOperations(done);
-//     });
+	opnErr = persistence.Open("")
+	if opnErr != nil {
+		t.Error("Error opened persistence", opnErr)
+		return
+	}
+	defer persistence.Close("")
 
-//     test('Batch Operations', (done) => {
-//         fixture.testBatchOperations(done);
-//     });
-// });
+	opnErr = persistence.Clear("")
+	if opnErr != nil {
+		t.Error("Error cleaned persistence", opnErr)
+		return
+	}
+
+	t.Run("Connection", func(t *testing.T) {
+		assert.NotNil(t, connection.GetConnection())
+		assert.NotNil(t, connection.GetDatabaseName())
+		assert.NotEqual(t, "", connection.GetDatabaseName())
+	})
+
+	t.Run("DummyPostgresConnection:CRUD", fixture.TestCrudOperations)
+	t.Run("DummyPostgresConnection:Batch", fixture.TestBatchOperations)
+
+}

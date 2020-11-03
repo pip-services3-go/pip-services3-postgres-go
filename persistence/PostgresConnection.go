@@ -140,7 +140,8 @@ func (c *PostgresConnection) Close(correlationId string) error {
 	if c.Connection == nil {
 		return nil
 	}
-	c.Connection.Close()
+	// TODO: Need check why loop on this command when use external connection
+	//c.Connection.Close()
 	c.Logger.Debug(correlationId, "Disconnected from postgres database %s", c.DatabaseName)
 	c.Connection = nil
 	c.DatabaseName = ""

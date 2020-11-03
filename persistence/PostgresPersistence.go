@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackc/pgproto3/v2"
 	"github.com/jackc/pgx/v4/pgxpool"
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cconv "github.com/pip-services3-go/pip-services3-commons-go/convert"
@@ -18,6 +19,7 @@ import (
 	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	clog "github.com/pip-services3-go/pip-services3-components-go/log"
+	cmpersist "github.com/pip-services3-go/pip-services3-data-go/persistence"
 )
 
 /*
@@ -252,7 +254,7 @@ func (c *PostgresPersistence) QuoteIdentifier(value string) string {
 	if value[0] == '\'' {
 		return value
 	}
-	return "'" + value + "'"
+	return "\"" + value + "\""
 }
 
 // Checks if the component is opened.
@@ -264,7 +266,7 @@ func (c *PostgresPersistence) IsOpen() bool {
 // Opens the component.
 // - correlationId 	(optional) transaction id to trace execution through call chain.
 // - Returns 			 error or nil no errors occured.
-func (c *PostgresPersistence) open(correlationId string) (err error) {
+func (c *PostgresPersistence) Open(correlationId string) (err error) {
 	if c.opened {
 		return nil
 	}
@@ -363,9 +365,14 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 	}
 
 	// If table already exists then exit
-	if result != nil {
-		if val, _ := result.Values(); len(val) > 0 { //&& result.rows[0].to_regclass != nil
-			return qErr
+	if result != nil && result.Next() {
+		val, cErr := result.Values()
+		if cErr != nil {
+			return cErr
+		}
+
+		if len(val) > 0 && val[0] == c.TableName {
+			return nil
 		}
 	}
 	c.Logger.Debug(correlationId, "Table "+c.TableName+" does not exist. Creating database objects...")
@@ -378,7 +385,6 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 			if err != nil {
 				c.Logger.Error(correlationId, err, "Failed to autocreate database object")
 			}
-
 		}
 	}()
 	wg.Wait()
@@ -439,16 +445,57 @@ func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 // Returns a generated list of value parameters
 func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 
+	// String arrays
+	if val, ok := values.([]interface{}); ok {
+		return c.generateParamString(len(val))
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Array {
+		panic("Values must be string array")
+	}
+
+	if val, ok := values.(map[string]interface{}); ok {
+		return c.generateParamString(len(val))
+	}
+
+	if reflect.TypeOf(values).Kind() == reflect.Map {
+		panic("Values must be map[string]interface{}")
+	}
+
+	object := reflect.ValueOf(values)
+	if object.Kind() == reflect.Ptr {
+		object = object.Elem()
+	}
+	return c.generateParamString(object.NumField())
+
+}
+
+func (c *PostgresPersistence) generateParamString(paramNum int) string {
+	result := strings.Builder{}
+	for index := 1; index <= paramNum; index++ {
+		if result.String() != "" {
+			result.WriteString(",")
+		}
+		result.WriteString("$")
+		result.WriteString(strconv.FormatInt((int64)(index), 16))
+	}
+
+	return result.String()
+}
+
+// Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
+// - values a key-value map with columns and values
+// Returns a generated list of column sets
+func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
+
 	result := strings.Builder{}
 	// String arrays
 	if val, ok := values.([]string); ok {
-		for index, _ := range val {
+		for index, column := range val {
 			if result.String() != "" {
 				result.WriteString(",")
 			}
-			result.WriteString("$")
-			result.WriteString(strconv.FormatInt((int64)(index), 16))
-
+			result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index+1), 16))
 		}
 		return result.String()
 	}
@@ -458,14 +505,13 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 	}
 
 	if val, ok := values.(map[string]interface{}); ok {
-
-		for index := 1; index != len(val); index++ {
+		index := 1
+		for column, _ := range val {
 			if result.String() != "" {
 				result.WriteString(",")
 			}
-			result.WriteString("$")
-			result.WriteString(strconv.FormatInt((int64)(index), 16))
-
+			result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
+			index++
 		}
 		return result.String()
 	}
@@ -478,31 +524,16 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 	if object.Kind() == reflect.Ptr {
 		object = object.Elem()
 	}
+	typ := object.Type()
 	for i := 0; i < object.NumField(); i++ {
 		if result.String() != "" {
 			result.WriteString(",")
 		}
-		result.WriteString("$")
-		result.WriteString(strconv.FormatInt((int64)(i+1), 16))
+		result.WriteString(c.QuoteIdentifier(typ.Field(i).Name) + "=$" + strconv.FormatInt((int64)(i+1), 16))
 	}
 	return result.String()
+
 }
-
-// Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
-// - values a key-value map with columns and values
-// Returns a generated list of column sets
-// func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
-
-// 	let result = "";
-// 	let index = 1;
-
-// 	for (let column in values) {
-// 	    if (result != "") result += ",";
-// 	    result += c.QuoteIdentifier(column) + "=$" + index;
-// 	    index++;
-// 	}
-// 	return result;
-// }
 
 // Generates a list of column parameters
 // - values a key-value map with columns and values
@@ -572,23 +603,23 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 	}
 
 	if skip >= 0 {
-		query += " OFFSET " + strconv.FormatInt(skip, 64)
+		query += " OFFSET " + strconv.FormatInt(skip, 10)
 	}
-	query += " LIMIT " + strconv.FormatInt(take, 64)
 
-	result, qErr := c.Client.Query(context.TODO(), query)
+	query += " LIMIT " + strconv.FormatInt(take, 10)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
 
 	if qErr != nil {
 		return nil, qErr
 	}
 
-	items := make([]interface{}, 0, 1)
-	rows, vErr := result.Values()
-	if vErr != nil {
-		return nil, vErr
-	}
-	for _, row := range rows {
-		item := c.ConvertFromMap(row)
+	items := make([]interface{}, 0, 0)
+	for qResult.Next() {
+		rows, vErr := qResult.Values()
+		if vErr != nil {
+			continue
+		}
+		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
 		items = append(items, item)
 	}
 
@@ -608,12 +639,10 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 			return nil, qErr
 		}
 		var count int64 = 0
-		if result != nil {
+		if result != nil && result.Next() {
 			rows, _ := result.Values()
 			if len(rows) == 1 {
-				if row, ok := rows[0].(map[string]interface{}); ok {
-					count = cconv.LongConverter.ToLong(row["count"])
-				}
+				count = cconv.LongConverter.ToLong(rows[0])
 			}
 		}
 		page = cdata.NewDataPage(&count, items)
@@ -646,12 +675,10 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 	}
 
 	count = 0
-	if result != nil {
+	if result != nil && result.Next() {
 		rows, _ := result.Values()
 		if len(rows) == 1 {
-			if row, ok := rows[0].(map[string]interface{}); ok {
-				count = cconv.LongConverter.ToLong(row["count"])
-			}
+			count = cconv.LongConverter.ToLong(rows[0])
 		}
 	}
 	if count != 0 {
@@ -659,7 +686,6 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 	}
 
 	return count, nil
-
 }
 
 // Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
@@ -697,13 +723,14 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 	if qErr != nil {
 		return nil, qErr
 	}
+
 	items = make([]interface{}, 0, 1)
-	rows, vErr := result.Values()
-	if vErr != nil {
-		return nil, vErr
-	}
-	for _, row := range rows {
-		item := c.ConvertFromMap(row)
+	for result.Next() {
+		rows, vErr := result.Values()
+		if vErr != nil {
+			continue
+		}
+		item := c.ConvertFromRows(result.FieldDescriptions(), rows)
 		items = append(items, item)
 	}
 
@@ -711,7 +738,6 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 		c.Logger.Trace(correlationId, "Retrieved %d from %s", len(items), c.TableName)
 	}
 	return items, nil
-
 }
 
 // Gets a random item from items that match to a given filter.
@@ -735,7 +761,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 		return nil, qErr
 	}
 
-	query = "SELECTFROM " + c.QuoteIdentifier(c.TableName)
+	query = "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
 
 	if filter != nil {
 		if flt, ok := filter.(string); ok && flt != "" {
@@ -744,7 +770,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 
 	var count int64 = 0
-	if result != nil {
+	if result != nil && result.Next() {
 		rows, _ := result.Values()
 		if len(rows) == 1 {
 			if row, ok := rows[0].(map[string]interface{}); ok {
@@ -760,14 +786,17 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	if qErr != nil {
 		return nil, qErr
 	}
-	rows, vErr := result.Values()
-	if vErr == nil && len(rows) > 0 {
-		item := c.ConvertFromMap(rows[0])
-		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
-		return item, nil
+	if result.Next() {
+		rows, vErr := result.Values()
+		if vErr == nil {
+			item := c.ConvertFromRows(result.FieldDescriptions(), rows)
+			c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
+			return item, nil
+		}
+		return nil, vErr
 	}
 	c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
-	return nil, vErr
+	return nil, nil
 }
 
 // Creates a data item.
@@ -785,20 +814,18 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
-	results, qErr := c.Client.Query(context.TODO(), query, values)
+	results, qErr := c.Client.Query(context.TODO(), query, values...)
 
-	if qErr == nil {
+	if qErr == nil && results.Next() {
 		rows, vErr := results.Values()
 		if vErr != nil {
 			return nil, vErr
 		}
-		if len(rows) > 0 {
-			item := c.ConvertFromMap(rows[0])
-			return item, nil
-		}
-		if row, ok := rows[0].(map[string]interface{}); ok {
-			c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, row["id"])
-		}
+
+		item := c.ConvertFromRows(results.FieldDescriptions(), rows)
+		id := cmpersist.GetObjectId(item)
+		c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
+		return item, nil
 	}
 	return nil, qErr
 }
@@ -819,12 +846,10 @@ func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string
 
 	if qErr == nil {
 		var count int64 = 0
-		if result != nil {
+		if result != nil && result.Next() {
 			rows, _ := result.Values()
 			if len(rows) == 1 {
-				if row, ok := rows[0].(map[string]interface{}); ok {
-					count = cconv.LongConverter.ToLong(row["rowCount"])
-				}
+				count = cconv.LongConverter.ToLong(rows[0])
 			}
 		}
 		c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
@@ -843,6 +868,8 @@ func (c *PostgresPersistence) NewObjectByPrototype() reflect.Value {
 
 func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) interface{} {
 	item := docPointer.Elem().Interface()
+	// TODO: decide how call nedded instance of ConvertToPublic
+	//c.ConvertToPublic(&item)
 	if c.Prototype.Kind() == reflect.Ptr {
 		return docPointer.Interface()
 	}
@@ -850,7 +877,14 @@ func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) in
 }
 
 // ConvertFromMap method are converts from map[string]interface{} to object, defined by c.Prototype
-func (c *PostgresPersistence) ConvertFromMap(buf interface{}) interface{} {
+func (c *PostgresPersistence) ConvertFromRows(columns []pgproto3.FieldDescription, rows []interface{}) interface{} {
+
+	buf := make(map[string]interface{}, 0)
+
+	for index, column := range columns {
+		buf[(string)(column.Name)] = rows[index]
+	}
+
 	docPointer := c.NewObjectByPrototype()
 	jsonBuf, _ := json.Marshal(buf)
 	json.Unmarshal(jsonBuf, docPointer.Interface())
