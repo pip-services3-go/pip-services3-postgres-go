@@ -95,27 +95,20 @@ accessing c._collection and c._model properties.
     });
 */
 type IdentifiablePostgresPersistence struct {
-	PostgresPersistence
+	*PostgresPersistence
 }
 
 //    Creates a new instance of the persistence component.
 //    - collection    (optional) a collection name.
 func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *IdentifiablePostgresPersistence {
 	c := &IdentifiablePostgresPersistence{
-		PostgresPersistence: *NewPostgresPersistence(proto, tableName),
+		PostgresPersistence: NewPostgresPersistence(proto, tableName),
 	}
 
 	if tableName == "" {
 		panic("Table name could not be empty")
 	}
 	return c
-}
-
-// Converts the given object from the public partial format.
-// - value     the object to convert from the public partial format.
-// Returns the initial object.
-func (c *IdentifiablePostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
-	return c.PostgresPersistence.ConvertFromPublic(value)
 }
 
 // Gets a list of data items retrieved by given unique ids.
@@ -212,11 +205,11 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	newItem = cmpersist.CloneObject(item)
 	cmpersist.GenerateObjectId(&newItem)
 
-	row := c.ConvertFromPublic(item)
+	row := c.IPublicConvertable.ConvertFromPublic(item)
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
-	setParams := c.GenerateSetParameters(row)
-	values := c.GenerateValues(row)
+	setParams, col := c.GenerateSetParameters(row)
+	values := c.GenerateValues(col, row)
 	id := cmpersist.GetObjectId(newItem)
 
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ")" +
@@ -253,9 +246,9 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	newItem = cmpersist.CloneObject(item)
 	id := cmpersist.GetObjectId(newItem)
 
-	row := c.ConvertFromPublic(newItem)
-	params := c.GenerateSetParameters(row)
-	values := c.GenerateValues(row)
+	row := c.IPublicConvertable.ConvertFromPublic(newItem)
+	params, col := c.GenerateSetParameters(row)
+	values := c.GenerateValues(col, row)
 	values = append(values, id)
 
 	query := "UPDATE " + c.QuoteIdentifier(c.TableName) +
@@ -291,9 +284,9 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 		return nil, nil
 	}
 
-	row := c.ConvertFromPublicPartial(data.Value())
-	params := c.GenerateSetParameters(row)
-	values := c.GenerateValues(row)
+	row := c.IPublicConvertable.ConvertFromPublicPartial(data.Value())
+	params, col := c.GenerateSetParameters(row)
+	values := c.GenerateValues(col, row)
 	values = append(values, id)
 
 	query := "UPDATE " + c.QuoteIdentifier(c.TableName) +

@@ -92,6 +92,8 @@ accessing c._db or c._collection properties.
 */
 
 type PostgresPersistence struct {
+	IPublicConvertable
+
 	defaultConfig *cconf.ConfigParams
 
 	config          *cconf.ConfigParams
@@ -135,6 +137,7 @@ func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersi
 		MaxPageSize: 100,
 		Prototype:   proto,
 	}
+	c.IPublicConvertable = c
 	c.DependencyResolver = cref.NewDependencyResolver()
 	c.DependencyResolver.Configure(c.defaultConfig)
 	c.TableName = tableName
@@ -245,6 +248,13 @@ func (c *PostgresPersistence) ConvertToPublic(value interface{}) interface{} {
 // Returns converted object in internal format.
 func (c *PostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
 	return value
+}
+
+// Converts the given object from the public partial format.
+// - value     the object to convert from the public partial format.
+// Returns the initial object.
+func (c *PostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
+	return c.IPublicConvertable.ConvertFromPublic(value)
 }
 
 func (c *PostgresPersistence) QuoteIdentifier(value string) string {
@@ -398,12 +408,12 @@ func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 
 	result := strings.Builder{}
 	// String arrays
-	if val, ok := values.([]string); ok {
+	if val, ok := values.([]interface{}); ok {
 		for _, item := range val {
 			if result.String() != "" {
 				result.WriteString(",")
 			}
-			result.WriteString(c.QuoteIdentifier(item))
+			result.WriteString(c.QuoteIdentifier(item.(string)))
 		}
 		return result.String()
 	}
@@ -486,18 +496,21 @@ func (c *PostgresPersistence) generateParamString(paramNum int) string {
 // Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
 // - values a key-value map with columns and values
 // Returns a generated list of column sets
-func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
+func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params string, columns string) {
 
 	result := strings.Builder{}
+	col := strings.Builder{}
 	// String arrays
-	if val, ok := values.([]string); ok {
+	if val, ok := values.([]interface{}); ok {
 		for index, column := range val {
 			if result.String() != "" {
 				result.WriteString(",")
+				col.WriteString(",")
 			}
-			result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index+1), 16))
+			result.WriteString(c.QuoteIdentifier(column.(string)) + "=$" + strconv.FormatInt((int64)(index+1), 16))
+			col.WriteString(c.QuoteIdentifier(column.(string)))
 		}
-		return result.String()
+		return result.String(), col.String()
 	}
 
 	if reflect.TypeOf(values).Kind() == reflect.Array {
@@ -506,14 +519,16 @@ func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
 
 	if val, ok := values.(map[string]interface{}); ok {
 		index := 1
-		for column, _ := range val {
+		for item, _ := range val {
 			if result.String() != "" {
 				result.WriteString(",")
+				col.WriteString(",")
 			}
-			result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
+			result.WriteString(c.QuoteIdentifier(item) + "=$" + strconv.FormatInt((int64)(index), 16))
+			col.WriteString(c.QuoteIdentifier(item))
 			index++
 		}
-		return result.String()
+		return result.String(), col.String()
 	}
 
 	if reflect.TypeOf(values).Kind() == reflect.Map {
@@ -528,22 +543,30 @@ func (c *PostgresPersistence) GenerateSetParameters(values interface{}) string {
 	for i := 0; i < object.NumField(); i++ {
 		if result.String() != "" {
 			result.WriteString(",")
+			col.WriteString(",")
 		}
 		result.WriteString(c.QuoteIdentifier(typ.Field(i).Name) + "=$" + strconv.FormatInt((int64)(i+1), 16))
+		col.WriteString(c.QuoteIdentifier(typ.Field(i).Name))
 	}
-	return result.String()
+	return result.String(), col.String()
 
 }
 
 // Generates a list of column parameters
 // - values a key-value map with columns and values
 // Returns a generated list of column values
-func (c *PostgresPersistence) GenerateValues(values interface{}) []interface{} {
+func (c *PostgresPersistence) GenerateValues(columns string, values interface{}) []interface{} {
 	results := make([]interface{}, 0, 1)
 
 	if val, ok := values.(map[string]interface{}); ok {
-		for _, item := range val {
-			results = append(results, item)
+
+		if columns == "" {
+			panic("GenerateValues: Columns must be set for properly convert from map")
+		}
+
+		columnNames := strings.Split(strings.ReplaceAll(columns, "\"", ""), ",")
+		for _, item := range columnNames {
+			results = append(results, val[item])
 		}
 		return results
 	}
@@ -809,10 +832,10 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 		return nil, nil
 	}
 
-	row := c.ConvertFromPublic(item)
+	row := c.IPublicConvertable.ConvertFromPublic(item)
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
-	values := c.GenerateValues(row)
+	values := c.GenerateValues(columns, row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
 	results, qErr := c.Client.Query(context.TODO(), query, values...)
 
@@ -868,8 +891,6 @@ func (c *PostgresPersistence) NewObjectByPrototype() reflect.Value {
 
 func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) interface{} {
 	item := docPointer.Elem().Interface()
-	// TODO: decide how call nedded instance of ConvertToPublic
-	//c.ConvertToPublic(&item)
 	if c.Prototype.Kind() == reflect.Ptr {
 		return docPointer.Interface()
 	}
@@ -885,8 +906,9 @@ func (c *PostgresPersistence) ConvertFromRows(columns []pgproto3.FieldDescriptio
 		buf[(string)(column.Name)] = rows[index]
 	}
 
+	item := c.IPublicConvertable.ConvertToPublic(buf)
 	docPointer := c.NewObjectByPrototype()
-	jsonBuf, _ := json.Marshal(buf)
+	jsonBuf, _ := json.Marshal(item)
 	json.Unmarshal(jsonBuf, docPointer.Interface())
 	return c.ConvertResultToPublic(docPointer)
 }
