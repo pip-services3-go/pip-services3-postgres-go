@@ -267,7 +267,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 			c.Logger.Trace(correlationId, "Updated in %s with id = %s", c.TableName, id)
 			return result, nil
 		}
-		return vErr, nil
+		return nil, vErr
 	}
 	return nil, nil
 
@@ -305,7 +305,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 			c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
 			return result, nil
 		}
-		return vErr, nil
+		return nil, vErr
 	}
 	return nil, nil
 
@@ -332,7 +332,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 			c.Logger.Trace(correlationId, "Deleted from %s with id = %s", c.TableName, id)
 			return result, nil
 		}
-		return vErr, nil
+		return nil, vErr
 	}
 	return nil, nil
 }
