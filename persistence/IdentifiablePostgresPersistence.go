@@ -124,7 +124,7 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	items = make([]interface{}, 0, 1)
 	for qResult.Next() {
 		rows, vErr := qResult.Values()
@@ -155,7 +155,7 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil && len(rows) > 0 {
@@ -220,6 +220,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	if qErr != nil {
 		return nil, qErr
 	}
+	defer qResult.Close()
 
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
@@ -259,7 +260,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil && len(rows) > 0 {
@@ -297,7 +298,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil && len(rows) > 0 {
@@ -324,7 +325,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil && len(rows) > 0 {
@@ -351,7 +352,7 @@ func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids 
 	if qErr != nil {
 		return qErr
 	}
-
+	defer qResult.Close()
 	if qResult.Next() {
 		var count int64 = 0
 		rows, vErr := qResult.Values()

@@ -354,7 +354,7 @@ func (c *PostgresPersistence) Clear(correlationId string) error {
 
 	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
 
-	_, err := c.Client.Query(context.TODO(), query)
+	_, err := c.Client.Exec(context.TODO(), query)
 	if err != nil {
 		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").
 			WithCause(err)
@@ -369,14 +369,14 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 
 	// Check if table exist to determine weither to auto create objects
 	query := "SELECT to_regclass('" + c.TableName + "')"
-	result, qErr := c.Client.Query(context.TODO(), query)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
 	if qErr != nil {
 		return qErr
 	}
-
+	defer qResult.Close()
 	// If table already exists then exit
-	if result != nil && result.Next() {
-		val, cErr := result.Values()
+	if qResult != nil && qResult.Next() {
+		val, cErr := qResult.Values()
 		if cErr != nil {
 			return cErr
 		}
@@ -567,6 +567,8 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 		return nil, qErr
 	}
 
+	defer qResult.Close()
+
 	items := make([]interface{}, 0, 0)
 	for qResult.Next() {
 		rows, vErr := qResult.Values()
@@ -588,10 +590,12 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 				query += " WHERE " + flt
 			}
 		}
+
 		result, qErr := c.Client.Query(context.TODO(), query)
 		if qErr != nil {
 			return nil, qErr
 		}
+		defer result.Close()
 		var count int64 = 0
 		if result != nil && result.Next() {
 			rows, _ := result.Values()
@@ -623,14 +627,14 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 		}
 	}
 
-	result, qErr := c.Client.Query(context.TODO(), query)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
 	if qErr != nil {
 		return 0, qErr
 	}
-
+	defer qResult.Close()
 	count = 0
-	if result != nil && result.Next() {
-		rows, _ := result.Values()
+	if qResult != nil && qResult.Next() {
+		rows, _ := qResult.Values()
 		if len(rows) == 1 {
 			count = cconv.LongConverter.ToLong(rows[0])
 		}
@@ -672,19 +676,19 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 		}
 	}
 
-	result, qErr := c.Client.Query(context.TODO(), query)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
 
 	if qErr != nil {
 		return nil, qErr
 	}
-
+	defer qResult.Close()
 	items = make([]interface{}, 0, 1)
-	for result.Next() {
-		rows, vErr := result.Values()
+	for qResult.Next() {
+		rows, vErr := qResult.Values()
 		if vErr != nil {
 			continue
 		}
-		item := c.ConvertFromRows(result.FieldDescriptions(), rows)
+		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
 		items = append(items, item)
 	}
 
@@ -710,7 +714,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 		}
 	}
 
-	result, qErr := c.Client.Query(context.TODO(), query)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
 	if qErr != nil {
 		return nil, qErr
 	}
@@ -724,26 +728,28 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 
 	var count int64 = 0
-	if result != nil && result.Next() {
-		rows, _ := result.Values()
+	if qResult != nil && qResult.Next() {
+		rows, _ := qResult.Values()
 		if len(rows) == 1 {
 			if row, ok := rows[0].(map[string]interface{}); ok {
 				count = cconv.LongConverter.ToLong(row["count"])
 			}
 		}
 	}
+	qResult.Close()
 
 	rand.Seed(time.Now().UnixNano())
 	pos := rand.Int63n(int64(count))
 	query += " OFFSET " + strconv.FormatInt(pos, 10) + " LIMIT 1"
-	result, qErr = c.Client.Query(context.TODO(), query)
+	qResult, qErr = c.Client.Query(context.TODO(), query)
 	if qErr != nil {
 		return nil, qErr
 	}
-	if result.Next() {
-		rows, vErr := result.Values()
+	defer qResult.Close()
+	if qResult.Next() {
+		rows, vErr := qResult.Values()
 		if vErr == nil {
-			item := c.ConvertFromRows(result.FieldDescriptions(), rows)
+			item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
 			c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
 			return item, nil
 		}
@@ -768,15 +774,15 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(columns, row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
-	qResults, qErr := c.Client.Query(context.TODO(), query, values...)
-
-	if qErr == nil && qResults.Next() {
-		rows, vErr := qResults.Values()
+	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
+	defer qResult.Close()
+	if qErr == nil && qResult.Next() {
+		rows, vErr := qResult.Values()
 		if vErr != nil {
 			return nil, vErr
 		}
 
-		item := c.ConvertFromRows(qResults.FieldDescriptions(), rows)
+		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
 		id := cmpersist.GetObjectId(item)
 		c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
 		return item, nil
@@ -796,12 +802,13 @@ func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string
 		query += " WHERE " + filter
 	}
 
-	result, qErr := c.Client.Query(context.TODO(), query)
+	qResult, qErr := c.Client.Query(context.TODO(), query)
+	defer qResult.Close()
 
 	if qErr == nil {
 		var count int64 = 0
-		if result != nil && result.Next() {
-			rows, _ := result.Values()
+		if qResult != nil && qResult.Next() {
+			rows, _ := qResult.Values()
 			if len(rows) == 1 {
 				count = cconv.LongConverter.ToLong(rows[0])
 			}
