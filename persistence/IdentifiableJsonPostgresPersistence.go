@@ -199,6 +199,7 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 	if qErr != nil {
 		return nil, qErr
 	}
+	defer qResult.Close()
 
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
@@ -209,6 +210,6 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 		}
 		return vErr, nil
 	}
-	return nil, nil
+	return nil, qResult.Err()
 
 }

@@ -125,7 +125,7 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 		return nil, qErr
 	}
 	defer qResult.Close()
-	items = make([]interface{}, 0, 1)
+	items = make([]interface{}, 0, 0)
 	for qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr != nil {
@@ -140,7 +140,7 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 		c.Logger.Trace(correlationId, "Retrieved %d from %s", len(items), c.TableName)
 	}
 
-	return items, nil
+	return items, qResult.Err()
 }
 
 // Gets a data item by its unique id.
@@ -170,7 +170,7 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 		return nil, vErr
 	}
 	c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
-	return nil, nil
+	return nil, qResult.Err()
 }
 
 // Creates a data item.
@@ -231,7 +231,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 		}
 		return nil, vErr
 	}
-	return nil, nil
+	return nil, qResult.Err()
 }
 
 // Updates a data item.
@@ -270,7 +270,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 		}
 		return nil, vErr
 	}
-	return nil, nil
+	return nil, qResult.Err()
 
 }
 
@@ -308,7 +308,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 		}
 		return nil, vErr
 	}
-	return nil, nil
+	return nil, qResult.Err()
 
 }
 
@@ -335,7 +335,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 		}
 		return nil, vErr
 	}
-	return nil, nil
+	return nil, qResult.Err()
 }
 
 // Deletes multiple data items by their unique ids.
@@ -365,5 +365,5 @@ func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids 
 		return vErr
 	}
 
-	return nil
+	return qResult.Err()
 }

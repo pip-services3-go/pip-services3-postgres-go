@@ -391,14 +391,14 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 	go func() {
 		defer wg.Done()
 		for _, dml := range c.autoObjects {
-			_, err := c.Client.Query(context.TODO(), dml)
+			_, err := c.Client.Exec(context.TODO(), dml)
 			if err != nil {
 				c.Logger.Error(correlationId, err, "Failed to autocreate database object")
 			}
 		}
 	}()
 	wg.Wait()
-	return nil
+	return qResult.Err()
 }
 
 // Generates a list of column names to use in SQL statements like: "column1,column2,column3"
@@ -591,24 +591,24 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 			}
 		}
 
-		result, qErr := c.Client.Query(context.TODO(), query)
-		if qErr != nil {
-			return nil, qErr
+		qResult2, qErr2 := c.Client.Query(context.TODO(), query)
+		if qErr2 != nil {
+			return nil, qErr2
 		}
-		defer result.Close()
+		defer qResult2.Close()
 		var count int64 = 0
-		if result != nil && result.Next() {
-			rows, _ := result.Values()
+		if qResult2.Next() {
+			rows, _ := qResult2.Values()
 			if len(rows) == 1 {
 				count = cconv.LongConverter.ToLong(rows[0])
 			}
 		}
 		page = cdata.NewDataPage(&count, items)
-		return page, nil
+		return page, qResult2.Err()
 	}
 	var total int64 = 0
 	page = cdata.NewDataPage(&total, items)
-	return page, nil
+	return page, qResult.Err()
 }
 
 // Gets a number of data items retrieved by a given filter.
@@ -643,7 +643,7 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 		c.Logger.Trace(correlationId, "Counted %d items in %s", count, c.TableName)
 	}
 
-	return count, nil
+	return count, qResult.Err()
 }
 
 // Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
@@ -695,7 +695,7 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 	if items != nil {
 		c.Logger.Trace(correlationId, "Retrieved %d from %s", len(items), c.TableName)
 	}
-	return items, nil
+	return items, qResult.Err()
 }
 
 // Gets a random item from items that match to a given filter.
@@ -718,9 +718,9 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	if qErr != nil {
 		return nil, qErr
 	}
+	defer qResult.Close()
 
 	query = "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
-
 	if filter != nil {
 		if flt, ok := filter.(string); ok && flt != "" {
 			query += " WHERE " + flt
@@ -728,35 +728,36 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 
 	var count int64 = 0
-	if qResult != nil && qResult.Next() {
+	if qResult.Next() {
 		rows, _ := qResult.Values()
 		if len(rows) == 1 {
 			if row, ok := rows[0].(map[string]interface{}); ok {
 				count = cconv.LongConverter.ToLong(row["count"])
 			}
 		}
+	} else {
+		return nil, qResult.Err()
 	}
-	qResult.Close()
 
 	rand.Seed(time.Now().UnixNano())
 	pos := rand.Int63n(int64(count))
 	query += " OFFSET " + strconv.FormatInt(pos, 10) + " LIMIT 1"
-	qResult, qErr = c.Client.Query(context.TODO(), query)
-	if qErr != nil {
+	qResult2, qErr2 := c.Client.Query(context.TODO(), query)
+	if qErr2 != nil {
 		return nil, qErr
 	}
-	defer qResult.Close()
-	if qResult.Next() {
+	defer qResult2.Close()
+	if qResult2.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil {
-			item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+			item := c.ConvertFromRows(qResult2.FieldDescriptions(), rows)
 			c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
 			return item, nil
 		}
 		return nil, vErr
 	}
 	c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
-	return nil, nil
+	return nil, qResult2.Err()
 }
 
 // Creates a data item.
@@ -775,8 +776,11 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	values := c.GenerateValues(columns, row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
+	if qErr != nil {
+		return nil, qErr
+	}
 	defer qResult.Close()
-	if qErr == nil && qResult.Next() {
+	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr != nil {
 			return nil, vErr
@@ -787,7 +791,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 		c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
 		return item, nil
 	}
-	return nil, qErr
+	return nil, qResult.Err()
 }
 
 // Deletes data items that match to a given filter.
