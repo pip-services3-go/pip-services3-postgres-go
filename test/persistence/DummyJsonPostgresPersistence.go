@@ -19,7 +19,7 @@ func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence {
 	}
 
 	c.EnsureTable("", "")
-	c.EnsureIndex("dummies_json_key", map[string]string{"(data->>'Key')": "1"}, map[string]string{"unique": "true"})
+	c.EnsureIndex("dummies_json_key", map[string]string{"(data->>'key')": "1"}, map[string]string{"unique": "true"})
 	return c
 }
 
@@ -32,7 +32,7 @@ func (c *DummyJsonPostgresPersistence) GetPageByFilter(correlationId string, fil
 	key := filter.GetAsNullableString("Key")
 	filterObj := ""
 	if key != nil && *key != "" {
-		filterObj += "data->Key='" + *key + "'"
+		filterObj += "data->key='" + *key + "'"
 	}
 
 	tempPage, err := c.IdentifiablePostgresPersistence.GetPageByFilter(correlationId,
@@ -58,7 +58,7 @@ func (c *DummyJsonPostgresPersistence) GetCountByFilter(correlationId string, fi
 	filterObj := ""
 
 	if key != nil && *key != "" {
-		filterObj += "data->Key='" + *key + "'"
+		filterObj += "data->key='" + *key + "'"
 	}
 
 	return c.IdentifiablePostgresPersistence.GetCountByFilter(correlationId, filterObj)

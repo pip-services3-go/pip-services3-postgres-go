@@ -15,7 +15,10 @@ type DummyMapPostgresPersistence struct {
 func NewDummyMapPostgresPersistence() *DummyMapPostgresPersistence {
 	var t map[string]interface{}
 	proto := reflect.TypeOf(t)
-	return &DummyMapPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
+	c := &DummyMapPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
+	c.AutoCreateObject("CREATE TABLE dummies (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
+	c.EnsureIndex("dummies_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
+	return c
 }
 
 func (c *DummyMapPostgresPersistence) Create(correlationId string, item map[string]interface{}) (result map[string]interface{}, err error) {

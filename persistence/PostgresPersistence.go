@@ -354,11 +354,12 @@ func (c *PostgresPersistence) Clear(correlationId string) error {
 
 	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
 
-	_, err := c.Client.Exec(context.TODO(), query)
+	qResult, err := c.Client.Query(context.TODO(), query)
 	if err != nil {
 		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").
 			WithCause(err)
 	}
+	defer qResult.Close()
 	return err
 }
 
@@ -391,9 +392,12 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 	go func() {
 		defer wg.Done()
 		for _, dml := range c.autoObjects {
-			_, err := c.Client.Exec(context.TODO(), dml)
+			qResult, err := c.Client.Query(context.TODO(), dml)
 			if err != nil {
 				c.Logger.Error(correlationId, err, "Failed to autocreate database object")
+			}
+			if qResult != nil {
+				qResult.Close()
 			}
 		}
 	}()
