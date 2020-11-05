@@ -19,7 +19,7 @@ func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence {
 	}
 
 	c.EnsureTable("", "")
-	c.EnsureIndex("dummies_json_key", map[string]string{"(data->>'key')": "1"}, map[string]string{"unique": "true"})
+	c.EnsureIndex("dummies_json_key", map[string]string{"(data->'key')": "1"}, map[string]string{"unique": "true"})
 	return c
 }
 

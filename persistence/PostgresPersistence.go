@@ -218,9 +218,10 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 		if fields != "" {
 			fields += ", "
 		}
-		fields += c.QuoteIdentifier(key)
+		//fields += c.QuoteIdentifier(key)
+		fields += key
 		asc := keys[key]
-		if asc != "" {
+		if asc != "1" {
 			fields += " DESC"
 		}
 	}
