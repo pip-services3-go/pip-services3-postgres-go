@@ -106,9 +106,9 @@ func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string
 	c := &IdentifiableJsonPostgresPersistence{
 		IdentifiablePostgresPersistence: *NewIdentifiablePostgresPersistence(proto, tableName),
 	}
-	c.PerformConvertFromPublic = c.ConvertFromPublic
-	c.PerformConvertToPublic = c.ConvertToPublic
-	c.PerformConvertFromPublicPartial = c.ConvertFromPublic
+	c.ConvertFromPublic = c.PerformConvertFromPublic
+	c.ConvertToPublic = c.PerformConvertToPublic
+	c.ConvertFromPublicPartial = c.PerformConvertFromPublic
 	return c
 }
 
@@ -131,7 +131,7 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 // Converts object value from internal to public format.
 // - value     an object in internal format to convert.
 // Returns converted object in public format.
-func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
+func (c *IdentifiableJsonPostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} {
 
 	values, valErr := rows.Values()
 	if valErr != nil || values == nil {
@@ -160,7 +160,7 @@ func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(rows pgx.Rows) int
 //  Convert object value from public to internal format.
 //  - value     an object in public format to convert.
 //  Returns converted object in internal format.
-func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
+func (c *IdentifiableJsonPostgresPersistence) PerformConvertFromPublic(value interface{}) interface{} {
 	if value == nil {
 		return nil
 	}

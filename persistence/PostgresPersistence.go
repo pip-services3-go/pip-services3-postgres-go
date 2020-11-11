@@ -100,9 +100,9 @@ type PostgresPersistence struct {
 	localConnection bool
 	autoObjects     []string
 
-	PerformConvertFromPublic        func(interface{}) interface{}
-	PerformConvertToPublic          func(pgx.Rows) interface{}
-	PerformConvertFromPublicPartial func(interface{}) interface{}
+	ConvertFromPublic        func(interface{}) interface{}
+	ConvertToPublic          func(pgx.Rows) interface{}
+	ConvertFromPublicPartial func(interface{}) interface{}
 
 	//The dependency resolver.
 	DependencyResolver *cref.DependencyResolver
@@ -139,9 +139,10 @@ func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersi
 		MaxPageSize: 100,
 		Prototype:   proto,
 	}
-	c.PerformConvertFromPublic = c.ConvertFromPublic
-	c.PerformConvertToPublic = c.ConvertToPublic
-	c.PerformConvertFromPublicPartial = c.ConvertFromPublic
+
+	c.ConvertFromPublic = c.PerformConvertFromPublic
+	c.ConvertToPublic = c.PerformConvertToPublic
+	c.ConvertFromPublicPartial = c.PerformConvertFromPublic
 
 	c.DependencyResolver = cref.NewDependencyResolver()
 	c.DependencyResolver.Configure(c.defaultConfig)
@@ -245,7 +246,7 @@ func (c *PostgresPersistence) AutoCreateObject(dmlStatement string) {
 // Converts object value from internal to func (c * PostgresPersistence) format.
 // - value     an object in internal format to convert.
 // Returns converted object in func (c * PostgresPersistence) format.
-func (c *PostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
+func (c *PostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} {
 
 	values, valErr := rows.Values()
 	if valErr != nil || values == nil {
@@ -268,15 +269,15 @@ func (c *PostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
 // Convert object value from func (c * PostgresPersistence) to internal format.
 // - value     an object in func (c * PostgresPersistence) format to convert.
 // Returns converted object in internal format.
-func (c *PostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
+func (c *PostgresPersistence) PerformConvertFromPublic(value interface{}) interface{} {
 	return value
 }
 
 // Converts the given object from the public partial format.
 // - value     the object to convert from the public partial format.
 // Returns the initial object.
-func (c *PostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
-	return c.PerformConvertFromPublic(value)
+func (c *PostgresPersistence) PerformConvertFromPublicPartial(value interface{}) interface{} {
+	return c.ConvertFromPublic(value)
 }
 
 func (c *PostgresPersistence) QuoteIdentifier(value string) string {
@@ -597,7 +598,7 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 
 	items := make([]interface{}, 0, 0)
 	for qResult.Next() {
-		item := c.PerformConvertToPublic(qResult)
+		item := c.ConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -706,7 +707,7 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 	defer qResult.Close()
 	items = make([]interface{}, 0, 1)
 	for qResult.Next() {
-		item := c.PerformConvertToPublic(qResult)
+		item := c.ConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -770,7 +771,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil {
-		item := c.PerformConvertToPublic(qResult2)
+		item := c.ConvertToPublic(qResult2)
 		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
 		return item, nil
 	}
@@ -787,7 +788,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 		return nil, nil
 	}
 
-	row := c.PerformConvertFromPublic(item)
+	row := c.ConvertFromPublic(item)
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(columns, row)
@@ -800,7 +801,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	if !qResult.Next() {
 		return nil, qResult.Err()
 	}
-	item = c.PerformConvertToPublic(qResult)
+	item = c.ConvertToPublic(qResult)
 	id := cmpersist.GetObjectId(item)
 	c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
 	return item, nil
