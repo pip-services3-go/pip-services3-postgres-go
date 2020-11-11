@@ -92,8 +92,6 @@ accessing c._db or c._collection properties.
 */
 
 type PostgresPersistence struct {
-	IPublicConvertable
-
 	defaultConfig *cconf.ConfigParams
 
 	config          *cconf.ConfigParams
@@ -101,6 +99,10 @@ type PostgresPersistence struct {
 	opened          bool
 	localConnection bool
 	autoObjects     []string
+
+	PerformConvertFromPublic        func(interface{}) interface{}
+	PerformConvertToPublic          func(interface{}) interface{}
+	PerformConvertFromPublicPartial func(interface{}) interface{}
 
 	//The dependency resolver.
 	DependencyResolver *cref.DependencyResolver
@@ -137,7 +139,10 @@ func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersi
 		MaxPageSize: 100,
 		Prototype:   proto,
 	}
-	c.IPublicConvertable = c
+	c.PerformConvertFromPublic = c.ConvertFromPublic
+	c.PerformConvertToPublic = c.ConvertToPublic
+	c.PerformConvertFromPublicPartial = c.ConvertFromPublic
+
 	c.DependencyResolver = cref.NewDependencyResolver()
 	c.DependencyResolver.Configure(c.defaultConfig)
 	c.TableName = tableName
@@ -255,7 +260,7 @@ func (c *PostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
 // - value     the object to convert from the public partial format.
 // Returns the initial object.
 func (c *PostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
-	return c.IPublicConvertable.ConvertFromPublic(value)
+	return c.PerformConvertFromPublic(value)
 }
 
 func (c *PostgresPersistence) QuoteIdentifier(value string) string {
@@ -733,15 +738,14 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 
 	var count int64 = 0
-	if qResult.Next() {
-		rows, _ := qResult.Values()
-		if len(rows) == 1 {
-			if row, ok := rows[0].(map[string]interface{}); ok {
-				count = cconv.LongConverter.ToLong(row["count"])
-			}
-		}
-	} else {
+	if !qResult.Next() {
 		return nil, qResult.Err()
+	}
+	rows, _ := qResult.Values()
+	if len(rows) == 1 {
+		if row, ok := rows[0].(map[string]interface{}); ok {
+			count = cconv.LongConverter.ToLong(row["count"])
+		}
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -752,17 +756,17 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 		return nil, qErr
 	}
 	defer qResult2.Close()
-	if qResult2.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil {
-			item := c.ConvertFromRows(qResult2.FieldDescriptions(), rows)
-			c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
-			return item, nil
-		}
-		return nil, vErr
+	if !qResult2.Next() {
+		c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
+		return nil, qResult2.Err()
 	}
-	c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
-	return nil, qResult2.Err()
+	rows, vErr := qResult.Values()
+	if vErr == nil {
+		item := c.ConvertFromRows(qResult2.FieldDescriptions(), rows)
+		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
+		return item, nil
+	}
+	return nil, vErr
 }
 
 // Creates a data item.
@@ -775,7 +779,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 		return nil, nil
 	}
 
-	row := c.IPublicConvertable.ConvertFromPublic(item)
+	row := c.PerformConvertFromPublic(item)
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(columns, row)
@@ -785,18 +789,19 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 		return nil, qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr != nil {
-			return nil, vErr
-		}
-
-		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-		id := cmpersist.GetObjectId(item)
-		c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
-		return item, nil
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
+	rows, vErr := qResult.Values()
+	if vErr != nil {
+		return nil, vErr
+	}
+
+	item = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+	id := cmpersist.GetObjectId(item)
+	c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
+	return item, nil
+
 }
 
 // Deletes data items that match to a given filter.
@@ -814,17 +819,21 @@ func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string
 	qResult, qErr := c.Client.Query(context.TODO(), query)
 	defer qResult.Close()
 
-	if qErr == nil {
-		var count int64 = 0
-		if qResult != nil && qResult.Next() {
-			rows, _ := qResult.Values()
-			if len(rows) == 1 {
-				count = cconv.LongConverter.ToLong(rows[0])
-			}
-		}
-		c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
+	if qErr != nil {
+		return qErr
 	}
-	return qErr
+	defer qResult.Close()
+
+	var count int64 = 0
+	if !qResult.Next() {
+		return qResult.Err()
+	}
+	rows, _ := qResult.Values()
+	if len(rows) == 1 {
+		count = cconv.LongConverter.ToLong(rows[0])
+	}
+	c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
+	return nil
 }
 
 // service function for return pointer on new prototype object for unmarshaling
@@ -853,7 +862,7 @@ func (c *PostgresPersistence) ConvertFromRows(columns []pgproto3.FieldDescriptio
 		buf[(string)(column.Name)] = rows[index]
 	}
 
-	item := c.IPublicConvertable.ConvertToPublic(buf)
+	item := c.PerformConvertToPublic(buf)
 	docPointer := c.NewObjectByPrototype()
 	jsonBuf, _ := json.Marshal(item)
 	json.Unmarshal(jsonBuf, docPointer.Interface())

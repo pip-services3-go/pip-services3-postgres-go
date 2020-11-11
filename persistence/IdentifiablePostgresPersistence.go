@@ -156,21 +156,20 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 		return nil, qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-			if result == nil {
-				c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
-			} else {
-				c.Logger.Trace(correlationId, "Retrieved from %s with id = %s", c.TableName, id)
-			}
-			return result, nil
-		}
-		return nil, vErr
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
-	return nil, qResult.Err()
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		if result == nil {
+			c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
+		} else {
+			c.Logger.Trace(correlationId, "Retrieved from %s with id = %s", c.TableName, id)
+		}
+		return result, nil
+	}
+	return nil, vErr
 }
 
 // Creates a data item.
@@ -205,7 +204,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	newItem = cmpersist.CloneObject(item)
 	cmpersist.GenerateObjectId(&newItem)
 
-	row := c.IPublicConvertable.ConvertFromPublic(item)
+	row := c.PerformConvertFromPublic(item)
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
 	setParams, col := c.GenerateSetParameters(row)
@@ -222,16 +221,17 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	}
 	defer qResult.Close()
 
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-			c.Logger.Trace(correlationId, "Set in %s with id = %s", c.TableName, id)
-			return result, nil
-		}
-		return nil, vErr
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		c.Logger.Trace(correlationId, "Set in %s with id = %s", c.TableName, id)
+		return result, nil
+	}
+	return nil, vErr
+
 }
 
 // Updates a data item.
@@ -247,7 +247,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	newItem = cmpersist.CloneObject(item)
 	id := cmpersist.GetObjectId(newItem)
 
-	row := c.IPublicConvertable.ConvertFromPublic(newItem)
+	row := c.PerformConvertFromPublic(newItem)
 	params, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
@@ -261,17 +261,16 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 		return nil, qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-			c.Logger.Trace(correlationId, "Updated in %s with id = %s", c.TableName, id)
-			return result, nil
-		}
-		return nil, vErr
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
-
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		c.Logger.Trace(correlationId, "Updated in %s with id = %s", c.TableName, id)
+		return result, nil
+	}
+	return nil, vErr
 }
 
 // Updates only few selected fields in a data item.
@@ -285,7 +284,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 		return nil, nil
 	}
 
-	row := c.IPublicConvertable.ConvertFromPublicPartial(data.Value())
+	row := c.PerformConvertFromPublicPartial(data.Value())
 	params, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
@@ -299,17 +298,16 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 		return nil, qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-			c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
-			return result, nil
-		}
-		return nil, vErr
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
-
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
+		return result, nil
+	}
+	return nil, vErr
 }
 
 // Deleted a data item by it's unique id.
@@ -326,16 +324,16 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 		return nil, qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
-			c.Logger.Trace(correlationId, "Deleted from %s with id = %s", c.TableName, id)
-			return result, nil
-		}
-		return nil, vErr
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		c.Logger.Trace(correlationId, "Deleted from %s with id = %s", c.TableName, id)
+		return result, nil
+	}
+	return nil, vErr
 }
 
 // Deletes multiple data items by their unique ids.
@@ -353,17 +351,16 @@ func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids 
 		return qErr
 	}
 	defer qResult.Close()
-	if qResult.Next() {
-		var count int64 = 0
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) == 1 {
-			count = cconv.LongConverter.ToLong(rows[0])
-			if count != 0 {
-				c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
-			}
-		}
-		return vErr
+	if !qResult.Next() {
+		return qResult.Err()
 	}
-
-	return qResult.Err()
+	var count int64 = 0
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) == 1 {
+		count = cconv.LongConverter.ToLong(rows[0])
+		if count != 0 {
+			c.Logger.Trace(correlationId, "Deleted %d items from %s", count, c.TableName)
+		}
+	}
+	return vErr
 }

@@ -117,7 +117,9 @@ func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string
 	c := &IdentifiableJsonPostgresPersistence{
 		IdentifiablePostgresPersistence: *NewIdentifiablePostgresPersistence(proto, tableName),
 	}
-	c.IPublicConvertable = c
+	c.PerformConvertFromPublic = c.ConvertFromPublic
+	c.PerformConvertToPublic = c.ConvertToPublic
+	c.PerformConvertFromPublicPartial = c.ConvertFromPublic
 	return c
 }
 
@@ -173,13 +175,6 @@ func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublic(value interface{
 	return result
 }
 
-// Converts the given object from the public partial format.
-// - value     the object to convert from the public partial format.
-// Returns the initial object.
-func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
-	return c.IPublicConvertable.ConvertFromPublic(value)
-}
-
 //  Updates only few selected fields in a data item.
 //  - correlation_id    (optional) transaction id to trace execution through call chain.
 //  - id                an id of data item to be updated.
@@ -187,7 +182,7 @@ func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublicPartial(value int
 //  Returns          callback function that receives updated item or error.
 func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error) {
 
-	if data == nil { //|| id == null) {
+	if data == nil {
 		return nil, nil
 	}
 
