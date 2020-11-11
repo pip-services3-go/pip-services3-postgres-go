@@ -127,12 +127,8 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 	defer qResult.Close()
 	items = make([]interface{}, 0, 0)
 	for qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr != nil {
-			continue
-		}
 
-		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		item := c.PerformConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -161,7 +157,7 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		result := c.PerformConvertToPublic(qResult)
 		if result == nil {
 			c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
 		} else {
@@ -226,7 +222,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		result := c.PerformConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Set in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -240,7 +236,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 // Returns          (optional)  updated item or error.
 func (c *IdentifiablePostgresPersistence) Update(correlationId string, item interface{}) (result interface{}, err error) {
 
-	if item == nil { //|| item.id == nil
+	if item == nil {
 		return nil, nil
 	}
 	var newItem interface{}
@@ -266,7 +262,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		result := c.PerformConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Updated in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -280,7 +276,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 // Returns           updated item or error.
 func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error) {
 
-	if id == nil { //data == nil ||
+	if id == nil {
 		return nil, nil
 	}
 
@@ -303,7 +299,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		result := c.PerformConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -329,7 +325,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		result = c.PerformConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Deleted from %s with id = %s", c.TableName, id)
 		return result, nil
 	}

@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgproto3/v2"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cconv "github.com/pip-services3-go/pip-services3-commons-go/convert"
@@ -101,7 +101,7 @@ type PostgresPersistence struct {
 	autoObjects     []string
 
 	PerformConvertFromPublic        func(interface{}) interface{}
-	PerformConvertToPublic          func(interface{}) interface{}
+	PerformConvertToPublic          func(pgx.Rows) interface{}
 	PerformConvertFromPublicPartial func(interface{}) interface{}
 
 	//The dependency resolver.
@@ -245,8 +245,24 @@ func (c *PostgresPersistence) AutoCreateObject(dmlStatement string) {
 // Converts object value from internal to func (c * PostgresPersistence) format.
 // - value     an object in internal format to convert.
 // Returns converted object in func (c * PostgresPersistence) format.
-func (c *PostgresPersistence) ConvertToPublic(value interface{}) interface{} {
-	return value
+func (c *PostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
+
+	values, valErr := rows.Values()
+	if valErr != nil || values == nil {
+		return nil
+	}
+	columns := rows.FieldDescriptions()
+
+	buf := make(map[string]interface{}, 0)
+
+	for index, column := range columns {
+		buf[(string)(column.Name)] = values[index]
+	}
+	docPointer := c.NewObjectByPrototype()
+	jsonBuf, _ := json.Marshal(buf)
+	json.Unmarshal(jsonBuf, docPointer.Interface())
+	return c.ConvertResultToPublic(docPointer)
+
 }
 
 // Convert object value from func (c * PostgresPersistence) to internal format.
@@ -581,11 +597,7 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 
 	items := make([]interface{}, 0, 0)
 	for qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr != nil {
-			continue
-		}
-		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		item := c.PerformConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -694,11 +706,7 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 	defer qResult.Close()
 	items = make([]interface{}, 0, 1)
 	for qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr != nil {
-			continue
-		}
-		item := c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+		item := c.PerformConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -762,7 +770,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil {
-		item := c.ConvertFromRows(qResult2.FieldDescriptions(), rows)
+		item := c.PerformConvertToPublic(qResult2)
 		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
 		return item, nil
 	}
@@ -792,12 +800,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	if !qResult.Next() {
 		return nil, qResult.Err()
 	}
-	rows, vErr := qResult.Values()
-	if vErr != nil {
-		return nil, vErr
-	}
-
-	item = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+	item = c.PerformConvertToPublic(qResult)
 	id := cmpersist.GetObjectId(item)
 	c.Logger.Trace(correlationId, "Created in %s with id = %s", c.TableName, id)
 	return item, nil
@@ -851,20 +854,4 @@ func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) in
 		return docPointer.Interface()
 	}
 	return item
-}
-
-// ConvertFromMap method are converts from map[string]interface{} to object, defined by c.Prototype
-func (c *PostgresPersistence) ConvertFromRows(columns []pgproto3.FieldDescription, rows []interface{}) interface{} {
-
-	buf := make(map[string]interface{}, 0)
-
-	for index, column := range columns {
-		buf[(string)(column.Name)] = rows[index]
-	}
-
-	item := c.PerformConvertToPublic(buf)
-	docPointer := c.NewObjectByPrototype()
-	jsonBuf, _ := json.Marshal(item)
-	json.Unmarshal(jsonBuf, docPointer.Interface())
-	return c.ConvertResultToPublic(docPointer)
 }

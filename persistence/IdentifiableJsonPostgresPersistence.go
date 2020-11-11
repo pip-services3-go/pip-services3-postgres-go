@@ -2,38 +2,30 @@ package persistence
 
 import (
 	"context"
+	"encoding/json"
 	"reflect"
 
+	"github.com/jackc/pgx/v4"
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
 	cmpersist "github.com/pip-services3-go/pip-services3-data-go/persistence"
 )
-
-///* @module persistence */
-///* @hidden */
-// const _ = require('lodash');
-
-// import { AnyValueMap } from 'pip-services3-commons-node';
-// import { IIdentifiable } from 'pip-services3-commons-node';
-// import { IdGenerator } from 'pip-services3-commons-node';
-
-// import { IdentifiablePostgresPersistence } from './IdentifiablePostgresPersistence';
 
 ///*
 // Abstract persistence component that stores data in PostgreSQL in JSON or JSONB fields
 // and implements a number of CRUD operations over data items with unique ids.
 // The data items must implement IIdentifiable interface.
-//  *
+//
 // The JSON table has only two fields: id and data.
-//  *
+//
 // In basic scenarios child classes shall only override [[getPageByFilter]],
 // [[getListByFilter]] or [[deleteByFilter]] operations with specific filter function.
 // All other operations can be used out of the box.
-//  *
+//
 // In complex scenarios child classes can implement additional operations by
 // accessing c._collection and c._model properties.
 
 // ### Configuration parameters ###
-//  *
+//
 // - collection:                  (optional) PostgreSQL collection name
 // - connection(s):
 //   - discovery_key:             (optional) a key to retrieve the connection from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]]
@@ -48,21 +40,21 @@ import (
 //   - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
 //   - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
 //   - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
-//  *
+//
 // ### References ###
-//  *
+//
 // - \*:logger:\*:\*:1.0           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages components to pass log messages
 // - \*:discovery:\*:\*:1.0        (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]] services
 // - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
-//  *
+//
 // ### Example ###
-//  *
+//
 //     class MyPostgresPersistence extends IdentifiablePostgresJsonPersistence<MyData, string> {
-//  *
+//
 //     public constructor() {
 //         base("mydata", new MyDataPostgresSchema());
 //     }
-//  *
+//
 //     private composeFilter(filter: FilterParams): any {
 //         filter = filter || new FilterParams();
 //         let criteria = [];
@@ -71,24 +63,24 @@ import (
 //             criteria.push({ name: name });
 //         return criteria.length > 0 ? { $and: criteria } : null;
 //     }
-//  *
+//
 //     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
 //         callback: (err: any, page: DataPage<MyData>) => void): void {
 //         base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
 //     }
-//  *
+//
 //     }
-//  *
+//
 //     let persistence = new MyPostgresPersistence();
 //     persistence.configure(ConfigParams.fromTuples(
 //         "host", "localhost",
 //         "port", 27017
 //     ));
-//  *
+//
 //     persitence.open("123", (err) => {
 //         ...
 //     });
-//  *
+//
 //     persistence.create("123", { id: "1", name: "ABC" }, (err, item) => {
 //         persistence.getPageByFilter(
 //             "123",
@@ -96,7 +88,7 @@ import (
 //             null,
 //             (err, page) => {
 //                 console.log(page.data);          // Result: { id: "1", name: "ABC" }
-//  *
+//
 //                 persistence.deleteById("123", "1", (err, item) => {
 //                    ...
 //                 });
@@ -108,11 +100,8 @@ type IdentifiableJsonPostgresPersistence struct {
 	IdentifiablePostgresPersistence
 }
 
-/*
-Creates a new instance of the persistence component.
- *
-- collection    (optional) a collection name.
-*/
+// Creates a new instance of the persistence component.
+// - collection    (optional) a collection name.
 func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string) *IdentifiableJsonPostgresPersistence {
 	c := &IdentifiableJsonPostgresPersistence{
 		IdentifiablePostgresPersistence: *NewIdentifiablePostgresPersistence(proto, tableName),
@@ -123,12 +112,9 @@ func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string
 	return c
 }
 
-/*
-Adds DML statement to automatically create JSON(B) table
- *
-- idType type of the id column (default: TEXT)
-- dataType type of the data column (default: JSONB)
-*/
+// Adds DML statement to automatically create JSON(B) table
+// - idType type of the id column (default: TEXT)
+// - dataType type of the data column (default: JSONB)
 func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataType string) {
 	if idType == "" {
 		idType = "TEXT"
@@ -142,21 +128,33 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 	c.AutoCreateObject(query)
 }
 
-/*
-Converts object value from internal to public format.
- *
-- value     an object in internal format to convert.
-Returns converted object in public format.
-*/
-func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(value interface{}) interface{} {
-	if value == nil {
+// Converts object value from internal to public format.
+// - value     an object in internal format to convert.
+// Returns converted object in public format.
+func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
+
+	values, valErr := rows.Values()
+	if valErr != nil || values == nil {
 		return nil
 	}
-	val, ok := value.(map[string]interface{})
-	if ok {
-		return val["data"]
+	columns := rows.FieldDescriptions()
+
+	buf := make(map[string]interface{}, 0)
+
+	for index, column := range columns {
+		buf[(string)(column.Name)] = values[index]
 	}
-	return value
+
+	item, ok := buf["data"]
+	if !ok {
+		item = buf
+	}
+
+	docPointer := c.NewObjectByPrototype()
+	jsonBuf, _ := json.Marshal(item)
+	json.Unmarshal(jsonBuf, docPointer.Interface())
+	return c.ConvertResultToPublic(docPointer)
+
 }
 
 //  Convert object value from public to internal format.
@@ -199,7 +197,7 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 	if qResult.Next() {
 		rows, vErr := qResult.Values()
 		if vErr == nil && len(rows) > 0 {
-			result = c.ConvertFromRows(qResult.FieldDescriptions(), rows)
+			result = c.PerformConvertToPublic(qResult)
 			c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
 			return result, nil
 		}
