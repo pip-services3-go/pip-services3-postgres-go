@@ -153,7 +153,7 @@ func (c *IdentifiableJsonPostgresPersistence) PerformConvertToPublic(rows pgx.Ro
 	docPointer := c.NewObjectByPrototype()
 	jsonBuf, _ := json.Marshal(item)
 	json.Unmarshal(jsonBuf, docPointer.Interface())
-	return c.ConvertResultToPublic(docPointer)
+	return c.DereferenceObject(docPointer)
 
 }
 

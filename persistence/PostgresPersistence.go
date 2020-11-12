@@ -262,7 +262,7 @@ func (c *PostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} 
 	docPointer := c.NewObjectByPrototype()
 	jsonBuf, _ := json.Marshal(buf)
 	json.Unmarshal(jsonBuf, docPointer.Interface())
-	return c.ConvertResultToPublic(docPointer)
+	return c.DereferenceObject(docPointer)
 
 }
 
@@ -849,7 +849,7 @@ func (c *PostgresPersistence) NewObjectByPrototype() reflect.Value {
 	return reflect.New(proto)
 }
 
-func (c *PostgresPersistence) ConvertResultToPublic(docPointer reflect.Value) interface{} {
+func (c *PostgresPersistence) DereferenceObject(docPointer reflect.Value) interface{} {
 	item := docPointer.Elem().Interface()
 	if c.Prototype.Kind() == reflect.Ptr {
 		return docPointer.Interface()
