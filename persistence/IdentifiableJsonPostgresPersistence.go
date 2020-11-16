@@ -194,15 +194,15 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 	}
 	defer qResult.Close()
 
-	if qResult.Next() {
-		rows, vErr := qResult.Values()
-		if vErr == nil && len(rows) > 0 {
-			result = c.PerformConvertToPublic(qResult)
-			c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
-			return result, nil
-		}
-		return vErr, nil
+	if !qResult.Next() {
+		return nil, qResult.Err()
 	}
-	return nil, qResult.Err()
+	rows, vErr := qResult.Values()
+	if vErr == nil && len(rows) > 0 {
+		result = c.PerformConvertToPublic(qResult)
+		c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
+		return result, nil
+	}
+	return vErr, nil
 
 }
