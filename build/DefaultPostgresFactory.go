@@ -7,8 +7,8 @@ import (
 )
 
 // Creates Postgres components by their descriptors.
-// See [[Factory]]
-// See [[PostgresConnection]]
+// See Factory
+// See PostgresConnection
 type DefaultPostgresFactory struct {
 	cbuild.Factory
 	Descriptor                   *cref.Descriptor

@@ -14,45 +14,45 @@ import (
 Abstract persistence component that stores data in PostgreSQL
 and implements a number of CRUD operations over data items with unique ids.
 The data items must implement IIdentifiable interface.
- *
-In basic scenarios child classes shall only override [[getPageByFilter]],
-[[getListByFilter]] or [[deleteByFilter]] operations with specific filter function.
+
+In basic scenarios child classes shall only override getPageByFilter,
+getListByFilter or deleteByFilter operations with specific filter function.
 All other operations can be used out of the box.
- *
+
 In complex scenarios child classes can implement additional operations by
 accessing c._collection and c._model properties.
 
 ### Configuration parameters ###
- *
+
 - collection:                  (optional) PostgreSQL collection name
 - connection(s):
-  - discovery_key:             (optional) a key to retrieve the connection from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]]
-  - host:                      host name or IP address
-  - port:                      port number (default: 27017)
-  - uri:                       resource URI or connection string with all parameters in it
+   - discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+   - host:                      host name or IP address
+   - port:                      port number (default: 27017)
+   - uri:                       resource URI or connection string with all parameters in it
 - credential(s):
-  - store_key:                 (optional) a key to retrieve the credentials from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/auth.icredentialstore.html ICredentialStore]]
-  - username:                  (optional) user name
-  - password:                  (optional) user password
+   - store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+   - username:                  (optional) user name
+   - password:                  (optional) user password
 - options:
-  - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
-  - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
-  - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
- *
+   - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+   - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+   - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+ 
 ### References ###
- *
-- \*:logger:\*:\*:1.0           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages components to pass log messages
-- \*:discovery:\*:\*:1.0        (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]] services
+
+- \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) IDiscovery services
 - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
  *
 ### Example ###
- *
+ 
     class MyPostgresPersistence extends IdentifiablePostgresPersistence<MyData, string> {
- *
+ 
     public constructor() {
         base("mydata", new MyDataPostgresSchema());
     }
- *
+ 
     private composeFilter(filter: FilterParams): any {
         filter = filter || new FilterParams();
         let criteria = [];
@@ -61,24 +61,24 @@ accessing c._collection and c._model properties.
             criteria.push({ name: name });
         return criteria.length > 0 ? { $and: criteria } : null;
     }
- *
+ 
     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
         callback: (err: any, page: DataPage<MyData>) => void): void {
         base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
     }
- *
+
     }
- *
+
     let persistence = new MyPostgresPersistence();
     persistence.configure(ConfigParams.fromTuples(
         "host", "localhost",
         "port", 27017
     ));
- *
+
     persitence.open("123", (err) => {
         ...
     });
- *
+
     persistence.create("123", { id: "1", name: "ABC" }, (err, item) => {
         persistence.getPageByFilter(
             "123",
@@ -86,7 +86,7 @@ accessing c._collection and c._model properties.
             null,
             (err, page) => {
                 console.log(page.data);          // Result: { id: "1", name: "ABC" }
- *
+
                 persistence.deleteById("123", "1", (err, item) => {
                    ...
                 });
@@ -98,8 +98,8 @@ type IdentifiablePostgresPersistence struct {
 	*PostgresPersistence
 }
 
-//    Creates a new instance of the persistence component.
-//    - collection    (optional) a collection name.
+// Creates a new instance of the persistence component.
+//   - collection    (optional) a collection name.
 func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *IdentifiablePostgresPersistence {
 	c := &IdentifiablePostgresPersistence{
 		PostgresPersistence: NewPostgresPersistence(proto, tableName),
@@ -112,8 +112,8 @@ func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *I
 }
 
 // Gets a list of data items retrieved by given unique ids.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - ids               ids of data items to be retrieved
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - ids               ids of data items to be retrieved
 // Returns          a data list or error.
 func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids []interface{}) (items []interface{}, err error) {
 
@@ -140,8 +140,8 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 }
 
 // Gets a data item by its unique id.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - id                an id of data item to be retrieved.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - id                an id of data item to be retrieved.
 // Returns           data item or error.
 func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id interface{}) (item interface{}, err error) {
 
@@ -169,8 +169,8 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 }
 
 // Creates a data item.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - item              an item to be created.
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - item              an item to be created.
 // Returns          (optional)  created item or error.
 func (c *IdentifiablePostgresPersistence) Create(correlationId string, item interface{}) (result interface{}, err error) {
 	if item == nil {
@@ -186,8 +186,8 @@ func (c *IdentifiablePostgresPersistence) Create(correlationId string, item inte
 
 // Sets a data item. If the data item exists it updates it,
 // otherwise it create a new data item.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - item              a item to be set.
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - item              a item to be set.
 // Returns          (optional)  updated item or error.
 func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interface{}) (result interface{}, err error) {
 
@@ -231,8 +231,8 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 }
 
 // Updates a data item.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - item              an item to be updated.
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - item              an item to be updated.
 // Returns          (optional)  updated item or error.
 func (c *IdentifiablePostgresPersistence) Update(correlationId string, item interface{}) (result interface{}, err error) {
 
@@ -270,9 +270,9 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 }
 
 // Updates only few selected fields in a data item.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - id                an id of data item to be updated.
-// - data              a map with fields to be updated.
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - id                an id of data item to be updated.
+//   - data              a map with fields to be updated.
 // Returns           updated item or error.
 func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error) {
 
@@ -307,8 +307,8 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 }
 
 // Deleted a data item by it's unique id.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - id                an id of the item to be deleted
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - id                an id of the item to be deleted
 // Returns          (optional)  deleted item or error.
 func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id interface{}) (result interface{}, err error) {
 
@@ -333,8 +333,8 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 }
 
 // Deletes multiple data items by their unique ids.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - ids               ids of data items to be deleted.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - ids               ids of data items to be deleted.
 // Returns          (optional)  error or null for success.
 func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids []interface{}) error {
 
