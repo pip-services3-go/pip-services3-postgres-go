@@ -21,15 +21,15 @@ It is able to process multiple connections to Postgres cluster nodes.
 Configuration parameters
 
 - connection(s):
-  - discovery_key:               (optional) a key to retrieve the connection from IDiscovery
-  - host:                        host name or IP address
-  - port:                        port number (default: 27017)
-  - database:                    database name
-  - uri:                         resource URI or connection string with all parameters in it
+   - discovery_key:               (optional) a key to retrieve the connection from IDiscovery
+   - host:                        host name or IP address
+   - port:                        port number (default: 27017)
+   - database:                    database name
+   - uri:                         resource URI or connection string with all parameters in it
 - credential(s):
-  - store_key:                   (optional) a key to retrieve the credentials from ICredentialStore
-  - username:                    user name
-  - password:                    user password
+   - store_key:                   (optional) a key to retrieve the credentials from ICredentialStore
+   - username:                    user name
+   - password:                    user password
 
  References
 
@@ -54,8 +54,8 @@ func NewPostgresConnectionResolver() *PostgresConnectionResolver {
 
 // Configure is configures component by passing configuration parameters.
 // Parameters:
-// 	- config  *cconf.ConfigParams
-//  configuration parameters to be set.
+//   - config  *cconf.ConfigParams
+//   configuration parameters to be set.
 func (c *PostgresConnectionResolver) Configure(config *cconf.ConfigParams) {
 	c.ConnectionResolver.Configure(config)
 	c.CredentialResolver.Configure(config)
@@ -63,8 +63,8 @@ func (c *PostgresConnectionResolver) Configure(config *cconf.ConfigParams) {
 
 // SetReferences is sets references to dependent components.
 // Parameters:
-// 	- references crefer.IReferences
-//	references to locate the component dependencies.
+//   - references crefer.IReferences
+//   references to locate the component dependencies.
 func (c *PostgresConnectionResolver) SetReferences(references crefer.IReferences) {
 	c.ConnectionResolver.SetReferences(references)
 	c.CredentialResolver.SetReferences(references)
@@ -244,8 +244,8 @@ func (c *PostgresConnectionResolver) composeUri(connections []*ccon.ConnectionPa
 
 // Resolve method are resolves Postgres connection URI from connection and credential parameters.
 // Parameters:
-// 	- correlationId  string
-//	(optional) transaction id to trace execution through call chain.
+//   - correlationId  string
+//   (optional) transaction id to trace execution through call chain.
 // Returns uri string, err error
 // resolved URI and error, if this occured.
 func (c *PostgresConnectionResolver) Resolve(correlationId string) (uri string, err error) {

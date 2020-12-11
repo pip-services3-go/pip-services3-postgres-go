@@ -34,23 +34,23 @@ accessing c._db or c._collection properties.
 
 - collection:                  (optional) PostgreSQL collection name
 - connection(s):
-  - discovery_key:             (optional) a key to retrieve the connection from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]]
-  - host:                      host name or IP address
-  - port:                      port number (default: 27017)
-  - uri:                       resource URI or connection string with all parameters in it
+   - discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+   - host:                      host name or IP address
+   - port:                      port number (default: 27017)
+   - uri:                       resource URI or connection string with all parameters in it
 - credential(s):
-  - store_key:                 (optional) a key to retrieve the credentials from [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/auth.icredentialstore.html ICredentialStore]]
-  - username:                  (optional) user name
-  - password:                  (optional) user password
+   - store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+   - username:                  (optional) user name
+   - password:                  (optional) user password
 - options:
-  - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
-  - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
-  - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+   - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+   - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+   - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
 
 ### References ###
 
-- \*:logger:\*:\*:1.0           (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/log.ilogger.html ILogger]] components to pass log messages
-- \*:discovery:\*:\*:1.0        (optional) [[https://rawgit.com/pip-services-node/pip-services3-components-node/master/doc/api/interfaces/connect.idiscovery.html IDiscovery]] services
+- \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) IDiscovery services
 - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
 
 ### Example ###
@@ -121,7 +121,7 @@ type PostgresPersistence struct {
 }
 
 // Creates a new instance of the persistence component.
-// - tableName    (optional) a table name.
+//   - tableName    (optional) a table name.
 func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersistence {
 	c := &PostgresPersistence{
 		defaultConfig: cconf.NewConfigParamsFromTuples(
@@ -151,7 +151,7 @@ func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersi
 }
 
 // Configures component by passing configuration parameters.
-// - config    configuration parameters to be set.
+//   - config    configuration parameters to be set.
 func (c *PostgresPersistence) Configure(config *cconf.ConfigParams) {
 	config = config.SetDefaults(c.defaultConfig)
 	c.config = config
@@ -164,7 +164,7 @@ func (c *PostgresPersistence) Configure(config *cconf.ConfigParams) {
 }
 
 // Sets references to dependent components.
-// - references 	references to locate the component dependencies.
+//   - references 	references to locate the component dependencies.
 func (c *PostgresPersistence) SetReferences(references cref.IReferences) {
 	c.references = references
 	c.Logger.SetReferences(references)
@@ -201,8 +201,8 @@ func (c *PostgresPersistence) createConnection() *PostgresConnection {
 }
 
 // Adds index definition to create it on opening
-// - keys index keys (fields)
-// - options index options
+//   - keys index keys (fields)
+//   - options index options
 func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, options map[string]string) {
 	builder := "CREATE"
 	if options == nil {
@@ -238,13 +238,13 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 }
 
 // Adds index definition to create it on opening
-// - dmlStatement DML statement to autocreate database object
+//   - dmlStatement DML statement to autocreate database object
 func (c *PostgresPersistence) AutoCreateObject(dmlStatement string) {
 	c.autoObjects = append(c.autoObjects, dmlStatement)
 }
 
 // Converts object value from internal to func (c * PostgresPersistence) format.
-// - value     an object in internal format to convert.
+//   - value     an object in internal format to convert.
 // Returns converted object in func (c * PostgresPersistence) format.
 func (c *PostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} {
 
@@ -267,14 +267,14 @@ func (c *PostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} 
 }
 
 // Convert object value from func (c * PostgresPersistence) to internal format.
-// - value     an object in func (c * PostgresPersistence) format to convert.
+//   - value     an object in func (c * PostgresPersistence) format to convert.
 // Returns converted object in internal format.
 func (c *PostgresPersistence) PerformConvertFromPublic(value interface{}) interface{} {
 	return value
 }
 
 // Converts the given object from the public partial format.
-// - value     the object to convert from the public partial format.
+//   - value     the object to convert from the public partial format.
 // Returns the initial object.
 func (c *PostgresPersistence) PerformConvertFromPublicPartial(value interface{}) interface{} {
 	return c.ConvertFromPublic(value)
@@ -297,8 +297,8 @@ func (c *PostgresPersistence) IsOpen() bool {
 }
 
 // Opens the component.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
-// - Returns 			 error or nil no errors occured.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - Returns 			 error or nil no errors occured.
 func (c *PostgresPersistence) Open(correlationId string) (err error) {
 	if c.opened {
 		return nil
@@ -344,8 +344,8 @@ func (c *PostgresPersistence) Open(correlationId string) (err error) {
 }
 
 // Closes component and frees used resources.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
-// - Returns 			error or nil no errors occured.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - Returns 			error or nil no errors occured.
 func (c *PostgresPersistence) Close(correlationId string) (err error) {
 	if !c.opened {
 		return nil
@@ -367,8 +367,8 @@ func (c *PostgresPersistence) Close(correlationId string) (err error) {
 }
 
 // Clears component state.
-// - correlationId 	(optional) transaction id to trace execution through call chain.
-// - Returns 			error or nil no errors occured.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - Returns 			error or nil no errors occured.
 func (c *PostgresPersistence) Clear(correlationId string) error {
 	// Return error if collection is not set
 	if c.TableName == "" {
@@ -429,7 +429,7 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 }
 
 // Generates a list of column names to use in SQL statements like: "column1,column2,column3"
-// - values an array with column values or a key-value map
+//   - values an array with column values or a key-value map
 // Returns a generated list of column names
 func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 
@@ -449,7 +449,7 @@ func (c *PostgresPersistence) GenerateColumns(values interface{}) string {
 }
 
 // Generates a list of value parameters to use in SQL statements like: "$1,$2,$3"
-// - values an array with values or a key-value map
+//   - values an array with values or a key-value map
 // Returns a generated list of value parameters
 func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 
@@ -484,7 +484,7 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 }
 
 // Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
-// - values a key-value map with columns and values
+//   - values a key-value map with columns and values
 // Returns a generated list of column sets
 func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params string, columns string) {
 
@@ -508,7 +508,7 @@ func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params 
 }
 
 // Generates a list of column parameters
-// - values a key-value map with columns and values
+//   - values a key-value map with columns and values
 // Returns a generated list of column values
 func (c *PostgresPersistence) GenerateValues(columns string, values interface{}) []interface{} {
 	results := make([]interface{}, 0, 1)
@@ -547,12 +547,12 @@ func (c *PostgresPersistence) convertToMap(values interface{}) map[string]interf
 // Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
 // This method shall be called by a func (c * PostgresPersistence) getPageByFilter method from child class that
 // receives FilterParams and converts them into a filter function.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - filter            (optional) a filter JSON object
-// - paging            (optional) paging parameters
-// - sort              (optional) sorting JSON object
-// - select            (optional) projection JSON object
-// - Returns           receives a data page or error.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - filter            (optional) a filter JSON object
+//   - paging            (optional) paging parameters
+//   - sort              (optional) sorting JSON object
+//   - select            (optional) projection JSON object
+//   - Returns           receives a data page or error.
 func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter interface{}, paging *cdata.PagingParams,
 	sort interface{}, sel interface{}) (page *cdata.DataPage, err error) {
 
@@ -637,9 +637,9 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 // Gets a number of data items retrieved by a given filter.
 // This method shall be called by a func (c * PostgresPersistence) getCountByFilter method from child class that
 // receives FilterParams and converts them into a filter function.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - filter            (optional) a filter JSON object
-// - Returns           data page or error.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - filter            (optional) a filter JSON object
+//   - Returns           data page or error.
 func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter interface{}) (count int64, err error) {
 
 	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
@@ -672,12 +672,12 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 // Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
 // This method shall be called by a func (c * PostgresPersistence) getListByFilter method from child class that
 // receives FilterParams and converts them into a filter function.
-// - correlationId    (optional) transaction id to trace execution through call chain.
-// - filter           (optional) a filter JSON object
-// - paging           (optional) paging parameters
-// - sort             (optional) sorting JSON object
-// - select           (optional) projection JSON object
-// - Returns          data list or error.
+//   - correlationId    (optional) transaction id to trace execution through call chain.
+//   - filter           (optional) a filter JSON object
+//   - paging           (optional) paging parameters
+//   - sort             (optional) sorting JSON object
+//   - select           (optional) projection JSON object
+//   - Returns          data list or error.
 func (c *PostgresPersistence) GetListByFilter(correlationId string, filter interface{}, sort interface{}, sel interface{}) (items []interface{}, err error) {
 
 	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
@@ -720,9 +720,9 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 // Gets a random item from items that match to a given filter.
 // This method shall be called by a func (c * PostgresPersistence) getOneRandom method from child class that
 // receives FilterParams and converts them into a filter function.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - filter            (optional) a filter JSON object
-// - Returns            random item or error.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - filter            (optional) a filter JSON object
+//   - Returns            random item or error.
 func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interface{}) (item interface{}, err error) {
 
 	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
@@ -776,9 +776,9 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 }
 
 // Creates a data item.
-// - correlation_id    (optional) transaction id to trace execution through call chain.
-// - item              an item to be created.
-// - Returns          (optional) callback function that receives created item or error.
+//   - correlation_id    (optional) transaction id to trace execution through call chain.
+//   - item              an item to be created.
+//   - Returns          (optional) callback function that receives created item or error.
 func (c *PostgresPersistence) Create(correlationId string, item interface{}) (result interface{}, err error) {
 
 	if item == nil {
@@ -808,9 +808,9 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 // Deletes data items that match to a given filter.
 // This method shall be called by a func (c * PostgresPersistence) deleteByFilter method from child class that
 // receives FilterParams and converts them into a filter function.
-// - correlationId     (optional) transaction id to trace execution through call chain.
-// - filter            (optional) a filter JSON object.
-// - Returns           error or nil for success.
+//   - correlationId     (optional) transaction id to trace execution through call chain.
+//   - filter            (optional) a filter JSON object.
+//   - Returns           error or nil for success.
 func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string) (err error) {
 	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
 	if filter != "" {

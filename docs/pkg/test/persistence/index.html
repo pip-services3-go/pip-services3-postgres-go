@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>test - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.13.15";</script>
+<script src="../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6060/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package test
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "test/persistence"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="index.html#DummyJsonPostgresPersistence">type DummyJsonPostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewDummyJsonPostgresPersistence">func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.Create">func (c *DummyJsonPostgresPersistence) Create(correlationId string, item tf.Dummy) (result tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.DeleteById">func (c *DummyJsonPostgresPersistence) DeleteById(correlationId string, id string) (item tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.DeleteByIds">func (c *DummyJsonPostgresPersistence) DeleteByIds(correlationId string, ids []string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.GetCountByFilter">func (c *DummyJsonPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.GetListByIds">func (c *DummyJsonPostgresPersistence) GetListByIds(correlationId string, ids []string) (items []tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.GetOneById">func (c *DummyJsonPostgresPersistence) GetOneById(correlationId string, id string) (item tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.GetPageByFilter">func (c *DummyJsonPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.DummyPage, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.Update">func (c *DummyJsonPostgresPersistence) Update(correlationId string, item tf.Dummy) (result tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyJsonPostgresPersistence.UpdatePartially">func (c *DummyJsonPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item tf.Dummy, err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#DummyMapPostgresPersistence">type DummyMapPostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewDummyMapPostgresPersistence">func NewDummyMapPostgresPersistence() *DummyMapPostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.Create">func (c *DummyMapPostgresPersistence) Create(correlationId string, item map[string]interface{}) (result map[string]interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.DeleteById">func (c *DummyMapPostgresPersistence) DeleteById(correlationId string, id string) (item map[string]interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.DeleteByIds">func (c *DummyMapPostgresPersistence) DeleteByIds(correlationId string, ids []string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.GetCountByFilter">func (c *DummyMapPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.GetListByIds">func (c *DummyMapPostgresPersistence) GetListByIds(correlationId string, ids []string) (items []map[string]interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.GetOneById">func (c *DummyMapPostgresPersistence) GetOneById(correlationId string, id string) (item map[string]interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.GetPageByFilter">func (c *DummyMapPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.MapPage, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.Update">func (c *DummyMapPostgresPersistence) Update(correlationId string, item map[string]interface{}) (result map[string]interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyMapPostgresPersistence.UpdatePartially">func (c *DummyMapPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item map[string]interface{}, err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#DummyPostgresPersistence">type DummyPostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewDummyPostgresPersistence">func NewDummyPostgresPersistence() *DummyPostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.Create">func (c *DummyPostgresPersistence) Create(correlationId string, item tf.Dummy) (result tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.DeleteById">func (c *DummyPostgresPersistence) DeleteById(correlationId string, id string) (item tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.DeleteByIds">func (c *DummyPostgresPersistence) DeleteByIds(correlationId string, ids []string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.GetCountByFilter">func (c *DummyPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.GetListByIds">func (c *DummyPostgresPersistence) GetListByIds(correlationId string, ids []string) (items []tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.GetOneById">func (c *DummyPostgresPersistence) GetOneById(correlationId string, id string) (item tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.GetPageByFilter">func (c *DummyPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.DummyPage, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.Update">func (c *DummyPostgresPersistence) Update(correlationId string, item tf.Dummy) (result tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyPostgresPersistence.UpdatePartially">func (c *DummyPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item tf.Dummy, err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#DummyRefPostgresPersistence">type DummyRefPostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewDummyRefPostgresPersistence">func NewDummyRefPostgresPersistence() *DummyRefPostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.Create">func (c *DummyRefPostgresPersistence) Create(correlationId string, item *tf.Dummy) (result *tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.DeleteById">func (c *DummyRefPostgresPersistence) DeleteById(correlationId string, id string) (item *tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.DeleteByIds">func (c *DummyRefPostgresPersistence) DeleteByIds(correlationId string, ids []string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.GetCountByFilter">func (c *DummyRefPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.GetListByIds">func (c *DummyRefPostgresPersistence) GetListByIds(correlationId string, ids []string) (items []*tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.GetOneById">func (c *DummyRefPostgresPersistence) GetOneById(correlationId string, id string) (item *tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.GetPageByFilter">func (c *DummyRefPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.DummyRefPage, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.Update">func (c *DummyRefPostgresPersistence) Update(correlationId string, item *tf.Dummy) (result *tf.Dummy, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#DummyRefPostgresPersistence.UpdatePartially">func (c *DummyRefPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item *tf.Dummy, err error)</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go">DummyJsonPostgresPersistence.go</a>
+			
+				<a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go">DummyMapPostgresPersistence.go</a>
+			
+				<a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go">DummyPostgresPersistence.go</a>
+			
+				<a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go">DummyRefPostgresPersistence.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="DummyJsonPostgresPersistence">type <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=257:347#L1">DummyJsonPostgresPersistence</a>
+				<a class="permalink" href="index.html#DummyJsonPostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type DummyJsonPostgresPersistence struct {
+    <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/">ppersist</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewDummyJsonPostgresPersistence">func <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=349:417#L5">NewDummyJsonPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewDummyJsonPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDummyJsonPostgresPersistence() *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.Create">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=1941:2052#L57">Create</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.DeleteById">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=3621:3730#L110">DeleteById</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.DeleteById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) DeleteById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.DeleteByIds">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=3900:3998#L119">DeleteByIds</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.DeleteByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) DeleteByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.GetCountByFilter">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=1517:1647#L41">GetCountByFilter</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.GetCountByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) GetCountByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>) (count <a href="http://localhost:6060/pkg/builtin/#int64">int64</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.GetListByIds">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=2222:2339#L67">GetListByIds</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.GetListByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) GetListByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (items []<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.GetOneById">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=2650:2759#L81">GetOneById</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.GetOneById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) GetOneById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.GetPageByFilter">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=759:923#L16">GetPageByFilter</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.GetPageByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) GetPageByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>, paging *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#PagingParams">PagingParams</a>) (page *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#DummyPage">DummyPage</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.Update">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=2929:3040#L90">Update</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.Update">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) Update(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyJsonPostgresPersistence.UpdatePartially">func (*DummyJsonPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyJsonPostgresPersistence.go?s=3209:3348#L99">UpdatePartially</a>
+					<a class="permalink" href="index.html#DummyJsonPostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyJsonPostgresPersistence">DummyJsonPostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="DummyMapPostgresPersistence">type <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=257:342#L1">DummyMapPostgresPersistence</a>
+				<a class="permalink" href="index.html#DummyMapPostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type DummyMapPostgresPersistence struct {
+    <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/">ppersist</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewDummyMapPostgresPersistence">func <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=344:410#L5">NewDummyMapPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewDummyMapPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDummyMapPostgresPersistence() *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="DummyMapPostgresPersistence.Create">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=783:921#L14">Create</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}) (result map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.DeleteById">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=2550:2672#L67">DeleteById</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.DeleteById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) DeleteById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.DeleteByIds">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=2857:2954#L77">DeleteByIds</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.DeleteByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) DeleteByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.GetCountByFilter">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=3850:3979#L109">GetCountByFilter</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.GetCountByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) GetCountByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>) (count <a href="http://localhost:6060/pkg/builtin/#int64">int64</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.GetListByIds">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=1104:1234#L23">GetListByIds</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.GetListByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) GetListByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (items []map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.GetOneById">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=1573:1695#L37">GetOneById</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.GetOneById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) GetOneById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.GetPageByFilter">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=3125:3286#L85">GetPageByFilter</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.GetPageByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) GetPageByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>, paging *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#PagingParams">PagingParams</a>) (page *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#MapPage">MapPage</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.Update">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=1880:2018#L47">Update</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.Update">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) Update(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}) (result map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyMapPostgresPersistence.UpdatePartially">func (*DummyMapPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyMapPostgresPersistence.go?s=2202:2354#L57">UpdatePartially</a>
+					<a class="permalink" href="index.html#DummyMapPostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyMapPostgresPersistence">DummyMapPostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (item map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="DummyPostgresPersistence">type <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=257:339#L1">DummyPostgresPersistence</a>
+				<a class="permalink" href="index.html#DummyPostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type DummyPostgresPersistence struct {
+    <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/">ppersist</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewDummyPostgresPersistence">func <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=341:401#L5">NewDummyPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewDummyPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDummyPostgresPersistence() *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="DummyPostgresPersistence.Create">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=848:955#L16">Create</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.DeleteById">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=2417:2522#L68">DeleteById</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.DeleteById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) DeleteById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.DeleteByIds">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=2692:2786#L77">DeleteByIds</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.DeleteByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) DeleteByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.GetCountByFilter">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=3724:3850#L111">GetCountByFilter</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.GetCountByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) GetCountByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>) (count <a href="http://localhost:6060/pkg/builtin/#int64">int64</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.GetListByIds">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=1125:1238#L26">GetListByIds</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.GetListByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) GetListByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (items []<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.GetOneById">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=1549:1654#L40">GetOneById</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.GetOneById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) GetOneById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.GetPageByFilter">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=2957:3117#L85">GetPageByFilter</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.GetPageByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) GetPageByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>, paging *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#PagingParams">PagingParams</a>) (page *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#DummyPage">DummyPage</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.Update">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=1824:1931#L49">Update</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.Update">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) Update(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyPostgresPersistence.UpdatePartially">func (*DummyPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyPostgresPersistence.go?s=2100:2235#L58">UpdatePartially</a>
+					<a class="permalink" href="index.html#DummyPostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyPostgresPersistence">DummyPostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (item <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="DummyRefPostgresPersistence">type <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=349:434#L3">DummyRefPostgresPersistence</a>
+				<a class="permalink" href="index.html#DummyRefPostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+extends IdentifiablePostgresPersistence&lt;Dummy, string&gt;
+implements IDummyPersistence {
+</p>
+
+			<pre>type DummyRefPostgresPersistence struct {
+    <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/">ppersist</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/persistence/#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewDummyRefPostgresPersistence">func <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=436:502#L7">NewDummyRefPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewDummyRefPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDummyRefPostgresPersistence() *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="DummyRefPostgresPersistence.Create">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=648:760#L13">Create</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.DeleteById">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=2245:2354#L65">DeleteById</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.DeleteById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) DeleteById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.DeleteByIds">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=2525:2622#L74">DeleteByIds</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.DeleteByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) DeleteByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.GetCountByFilter">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=3599:3728#L108">GetCountByFilter</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.GetCountByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) GetCountByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>) (count <a href="http://localhost:6060/pkg/builtin/#int64">int64</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.GetListByIds">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=931:1048#L23">GetListByIds</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.GetListByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) GetListByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []<a href="http://localhost:6060/pkg/builtin/#string">string</a>) (items []*<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.GetOneById">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=1361:1470#L37">GetOneById</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.GetOneById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) GetOneById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (item *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.GetPageByFilter">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=2793:2959#L82">GetPageByFilter</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.GetPageByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) GetPageByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#FilterParams">FilterParams</a>, paging *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#PagingParams">PagingParams</a>) (page *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#DummyRefPage">DummyRefPage</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.Update">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=1641:1753#L46">Update</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.Update">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) Update(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>) (result *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="DummyRefPostgresPersistence.UpdatePartially">func (*DummyRefPostgresPersistence) <a href="http://localhost:6060/src/test/persistence/DummyRefPostgresPersistence.go?s=1923:2062#L55">UpdatePartially</a>
+					<a class="permalink" href="index.html#DummyRefPostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#DummyRefPostgresPersistence">DummyRefPostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id <a href="http://localhost:6060/pkg/builtin/#string">string</a>, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (item *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/">tf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures/#Dummy">Dummy</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.13.15.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6060/LICENSE">BSD license</a>.<br>
+<a href="http://localhost:6060/doc/tos.html">Terms of Service</a> |
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

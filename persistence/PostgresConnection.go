@@ -13,33 +13,33 @@ import (
 )
 
 /**
- * PostgreSQL connection using plain driver.
- *
- * By defining a connection and sharing it through multiple persistence components
- * you can reduce number of used database connections.
- *
- * ### Configuration parameters ###
- *
- * - connection(s):
- *   - discovery_key:             (optional) a key to retrieve the connection from [[IDiscovery]]
- *   - host:                      host name or IP address
- *   - port:                      port number (default: 27017)
- *   - uri:                       resource URI or connection string with all parameters in it
- * - credential(s):
- *   - store_key:                 (optional) a key to retrieve the credentials from [[ICredentialStore]]
- *   - username:                  user name
- *   - password:                  user password
- * - options:
- *   - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
- *   - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
- *   - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
- *
- * ### References ###
- *
- * - \*:logger:\*:\*:1.0           (optional) [[ILogger]] components to pass log messages
- * - \*:discovery:\*:\*:1.0        (optional) [[ IDiscovery]] services
- * - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
- *
+ PostgreSQL connection using plain driver.
+
+ By defining a connection and sharing it through multiple persistence components
+ you can reduce number of used database connections.
+
+ ### Configuration parameters ###
+
+- connection(s):
+  - discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+  - host:                      host name or IP address
+  - port:                      port number (default: 27017)
+  - uri:                       resource URI or connection string with all parameters in it
+- credential(s):
+  - store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+  - username:                  user name
+  - password:                  user password
+- options:
+  - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+  - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+  - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+
+### References ###
+
+ - \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages
+ - \*:discovery:\*:\*:1.0        (optional) IDiscovery services
+ - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
+
  */
 type PostgresConnection struct {
 	defaultConfig *cconf.ConfigParams
@@ -80,7 +80,7 @@ func (c *PostgresConnection) Configure(config *cconf.ConfigParams) {
 }
 
 // Sets references to dependent components.
-//  - references 	references to locate the component dependencies.
+//   - references 	references to locate the component dependencies.
 func (c *PostgresConnection) SetReferences(references cref.IReferences) {
 	c.Logger.SetReferences(references)
 	c.ConnectionResolver.SetReferences(references)
@@ -93,8 +93,8 @@ func (c *PostgresConnection) IsOpen() bool {
 }
 
 // Opens the component.
-//  - correlationId 	(optional) transaction id to trace execution through call chain.
-//  - Return 			error or nil no errors occured.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - Return 			error or nil no errors occured.
 func (c *PostgresConnection) Open(correlationId string) error {
 
 	uri, err := c.ConnectionResolver.Resolve(correlationId)
@@ -134,7 +134,7 @@ func (c *PostgresConnection) Open(correlationId string) error {
 }
 
 // Closes component and frees used resources.
-//  - correlationId 	(optional) transaction id to trace execution through call chain.
+//   - correlationId 	(optional) transaction id to trace execution through call chain.
 // Return			 error or nil no errors occured
 func (c *PostgresConnection) Close(correlationId string) error {
 	if c.Connection == nil {

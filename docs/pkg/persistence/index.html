@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>persistence - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.13.15";</script>
+<script src="../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6060/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package persistence
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "persistence"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="index.html#IdentifiableJsonPostgresPersistence">type IdentifiableJsonPostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewIdentifiableJsonPostgresPersistence">func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string) *IdentifiableJsonPostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiableJsonPostgresPersistence.EnsureTable">func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataType string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiableJsonPostgresPersistence.PerformConvertFromPublic">func (c *IdentifiableJsonPostgresPersistence) PerformConvertFromPublic(value interface{}) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiableJsonPostgresPersistence.PerformConvertToPublic">func (c *IdentifiableJsonPostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiableJsonPostgresPersistence.UpdatePartially">func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#IdentifiablePostgresPersistence">type IdentifiablePostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewIdentifiablePostgresPersistence">func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *IdentifiablePostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.Create">func (c *IdentifiablePostgresPersistence) Create(correlationId string, item interface{}) (result interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.DeleteById">func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id interface{}) (result interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.DeleteByIds">func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids []interface{}) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.GetListByIds">func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids []interface{}) (items []interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.GetOneById">func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id interface{}) (item interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.Set">func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interface{}) (result interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.Update">func (c *IdentifiablePostgresPersistence) Update(correlationId string, item interface{}) (result interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#IdentifiablePostgresPersistence.UpdatePartially">func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, id interface{}, data *cdata.AnyValueMap) (result interface{}, err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#PostgresConnection">type PostgresConnection</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewPostgresConnection">func NewPostgresConnection() *PostgresConnection</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.Close">func (c *PostgresConnection) Close(correlationId string) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.Configure">func (c *PostgresConnection) Configure(config *cconf.ConfigParams)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.GetConnection">func (c *PostgresConnection) GetConnection() *pgxpool.Pool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.GetDatabaseName">func (c *PostgresConnection) GetDatabaseName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.IsOpen">func (c *PostgresConnection) IsOpen() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.Open">func (c *PostgresConnection) Open(correlationId string) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresConnection.SetReferences">func (c *PostgresConnection) SetReferences(references cref.IReferences)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#PostgresPersistence">type PostgresPersistence</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewPostgresPersistence">func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersistence</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.AutoCreateObject">func (c *PostgresPersistence) AutoCreateObject(dmlStatement string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.AutoCreateObjects">func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.Clear">func (c *PostgresPersistence) Clear(correlationId string) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.Close">func (c *PostgresPersistence) Close(correlationId string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.Configure">func (c *PostgresPersistence) Configure(config *cconf.ConfigParams)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.Create">func (c *PostgresPersistence) Create(correlationId string, item interface{}) (result interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.DeleteByFilter">func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.DereferenceObject">func (c *PostgresPersistence) DereferenceObject(docPointer reflect.Value) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.EnsureIndex">func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, options map[string]string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GenerateColumns">func (c *PostgresPersistence) GenerateColumns(values interface{}) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GenerateParameters">func (c *PostgresPersistence) GenerateParameters(values interface{}) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GenerateSetParameters">func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params string, columns string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GenerateValues">func (c *PostgresPersistence) GenerateValues(columns string, values interface{}) []interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GetCountByFilter">func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter interface{}) (count int64, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GetListByFilter">func (c *PostgresPersistence) GetListByFilter(correlationId string, filter interface{}, sort interface{}, sel interface{}) (items []interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GetOneRandom">func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interface{}) (item interface{}, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.GetPageByFilter">func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter interface{}, paging *cdata.PagingParams, sort interface{}, sel interface{}) (page *cdata.DataPage, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.IsOpen">func (c *PostgresPersistence) IsOpen() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.NewObjectByPrototype">func (c *PostgresPersistence) NewObjectByPrototype() reflect.Value</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.Open">func (c *PostgresPersistence) Open(correlationId string) (err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.PerformConvertFromPublic">func (c *PostgresPersistence) PerformConvertFromPublic(value interface{}) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.PerformConvertFromPublicPartial">func (c *PostgresPersistence) PerformConvertFromPublicPartial(value interface{}) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.PerformConvertToPublic">func (c *PostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.QuoteIdentifier">func (c *PostgresPersistence) QuoteIdentifier(value string) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.SetReferences">func (c *PostgresPersistence) SetReferences(references cref.IReferences)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PostgresPersistence.UnsetReferences">func (c *PostgresPersistence) UnsetReferences()</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go">IdentifiableJsonPostgresPersistence.go</a>
+			
+				<a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go">IdentifiablePostgresPersistence.go</a>
+			
+				<a href="http://localhost:6060/src/persistence/PostgresConnection.go">PostgresConnection.go</a>
+			
+				<a href="http://localhost:6060/src/persistence/PostgresPersistence.go">PostgresPersistence.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="IdentifiableJsonPostgresPersistence">type <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=3629:3713#L89">IdentifiableJsonPostgresPersistence</a>
+				<a class="permalink" href="index.html#IdentifiableJsonPostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Abstract persistence component that stores data in PostgreSQL in JSON or JSONB fields
+and implements a number of CRUD operations over data items with unique ids.
+The data items must implement IIdentifiable interface.
+</p>
+<p>
+The JSON table has only two fields: id and data.
+</p>
+<p>
+In basic scenarios child classes shall only override getPageByFilter,
+getListByFilter or deleteByFilter operations with specific filter function.
+All other operations can be used out of the box.
+</p>
+<p>
+In complex scenarios child classes can implement additional operations by
+accessing c._collection and c._model properties.
+</p>
+<p>
+### Configuration parameters ###
+</p>
+<p>
+- collection:                  (optional) PostgreSQL collection name
+- connection(s):
+</p>
+<pre>- discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+- host:                      host name or IP address
+- port:                      port number (default: 27017)
+- uri:                       resource URI or connection string with all parameters in it
+</pre>
+<p>
+- credential(s):
+</p>
+<pre>- store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+- username:                  (optional) user name
+- password:                  (optional) user password
+</pre>
+<p>
+- options:
+</p>
+<pre>  - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+  - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+  - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+
+### References ###
+
+- \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) IDiscovery services
+- \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
+
+### Example ###
+
+   class MyPostgresPersistence extends IdentifiablePostgresJsonPersistence&lt;MyData, string&gt; {
+
+   public constructor() {
+       base(&#34;mydata&#34;, new MyDataPostgresSchema());
+   }
+
+   private composeFilter(filter: FilterParams): any {
+       filter = filter || new FilterParams();
+       let criteria = [];
+       let name = filter.getAsNullableString(&#39;name&#39;);
+       if (name != null)
+           criteria.push({ name: name });
+       return criteria.length &gt; 0 ? { $and: criteria } : null;
+   }
+
+   public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
+       callback: (err: any, page: DataPage&lt;MyData&gt;) =&gt; void): void {
+       base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
+   }
+
+   }
+
+   let persistence = new MyPostgresPersistence();
+   persistence.configure(ConfigParams.fromTuples(
+       &#34;host&#34;, &#34;localhost&#34;,
+       &#34;port&#34;, 27017
+   ));
+
+   persitence.open(&#34;123&#34;, (err) =&gt; {
+       ...
+   });
+
+   persistence.create(&#34;123&#34;, { id: &#34;1&#34;, name: &#34;ABC&#34; }, (err, item) =&gt; {
+       persistence.getPageByFilter(
+           &#34;123&#34;,
+           FilterParams.fromTuples(&#34;name&#34;, &#34;ABC&#34;),
+           null,
+           (err, page) =&gt; {
+               console.log(page.data);          // Result: { id: &#34;1&#34;, name: &#34;ABC&#34; }
+
+               persistence.deleteById(&#34;123&#34;, &#34;1&#34;, (err, item) =&gt; {
+                   ...
+               });
+           }
+       )
+   });
+</pre>
+
+			<pre>type IdentifiableJsonPostgresPersistence struct {
+    <a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewIdentifiableJsonPostgresPersistence">func <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=3822:3940#L95">NewIdentifiableJsonPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewIdentifiableJsonPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewIdentifiableJsonPostgresPersistence(proto <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Type">Type</a>, tableName <a href="http://localhost:6060/pkg/builtin/#string">string</a>) *<a href="index.html#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a></pre>
+				<p>
+Creates a new instance of the persistence component.
+</p>
+<pre>- collection    (optional) a collection name.
+</pre>
+
+				
+				
+			
+
+			
+				
+				<h3 id="IdentifiableJsonPostgresPersistence.EnsureTable">func (*IdentifiableJsonPostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=4415:4504#L108">EnsureTable</a>
+					<a class="permalink" href="index.html#IdentifiableJsonPostgresPersistence.EnsureTable">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a>) EnsureTable(idType <a href="http://localhost:6060/pkg/builtin/#string">string</a>, dataType <a href="http://localhost:6060/pkg/builtin/#string">string</a>)</pre>
+				<p>
+Adds DML statement to automatically create JSON(B) table
+</p>
+<pre>- idType type of the id column (default: TEXT)
+- dataType type of the data column (default: JSONB)
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiableJsonPostgresPersistence.PerformConvertFromPublic">func (*IdentifiableJsonPostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=5658:5759#L153">PerformConvertFromPublic</a>
+					<a class="permalink" href="index.html#IdentifiableJsonPostgresPersistence.PerformConvertFromPublic">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a>) PerformConvertFromPublic(value interface{}) interface{}</pre>
+				<p>
+Convert object value from public to internal format.
+</p>
+<pre>- value     an object in public format to convert.
+</pre>
+<p>
+Returns converted object in internal format.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiableJsonPostgresPersistence.PerformConvertToPublic">func (*IdentifiableJsonPostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=4927:5022#L124">PerformConvertToPublic</a>
+					<a class="permalink" href="index.html#IdentifiableJsonPostgresPersistence.PerformConvertToPublic">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a>) PerformConvertToPublic(rows pgx.<a href="index.html#Rows">Rows</a>) interface{}</pre>
+				<p>
+Converts object value from internal to public format.
+</p>
+<pre>- value     an object in internal format to convert.
+</pre>
+<p>
+Returns converted object in public format.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiableJsonPostgresPersistence.UpdatePartially">func (*IdentifiableJsonPostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiableJsonPostgresPersistence.go?s=6255:6411#L171">UpdatePartially</a>
+					<a class="permalink" href="index.html#IdentifiableJsonPostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiableJsonPostgresPersistence">IdentifiableJsonPostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id interface{}, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Updates only few selected fields in a data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- id                an id of data item to be updated.
+- data              a map with fields to be updated.
+</pre>
+<p>
+Returns          callback function that receives updated item or error.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="IdentifiablePostgresPersistence">type <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=3589:3658#L87">IdentifiablePostgresPersistence</a>
+				<a class="permalink" href="index.html#IdentifiablePostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Abstract persistence component that stores data in PostgreSQL
+and implements a number of CRUD operations over data items with unique ids.
+The data items must implement IIdentifiable interface.
+</p>
+<p>
+In basic scenarios child classes shall only override getPageByFilter,
+getListByFilter or deleteByFilter operations with specific filter function.
+All other operations can be used out of the box.
+</p>
+<p>
+In complex scenarios child classes can implement additional operations by
+accessing c._collection and c._model properties.
+</p>
+<p>
+### Configuration parameters ###
+</p>
+<p>
+- collection:                  (optional) PostgreSQL collection name
+- connection(s):
+</p>
+<pre>- discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+- host:                      host name or IP address
+- port:                      port number (default: 27017)
+- uri:                       resource URI or connection string with all parameters in it
+</pre>
+<p>
+- credential(s):
+</p>
+<pre>- store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+- username:                  (optional) user name
+- password:                  (optional) user password
+</pre>
+<p>
+- options:
+</p>
+<pre>- connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+- idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+- max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+</pre>
+<p>
+### References ###
+</p>
+<p>
+- \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) IDiscovery services
+- \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
+</p>
+<pre>*
+</pre>
+<p>
+### Example ###
+</p>
+<pre>class MyPostgresPersistence extends IdentifiablePostgresPersistence&lt;MyData, string&gt; {
+
+public constructor() {
+    base(&#34;mydata&#34;, new MyDataPostgresSchema());
+}
+
+private composeFilter(filter: FilterParams): any {
+    filter = filter || new FilterParams();
+    let criteria = [];
+    let name = filter.getAsNullableString(&#39;name&#39;);
+    if (name != null)
+        criteria.push({ name: name });
+    return criteria.length &gt; 0 ? { $and: criteria } : null;
+}
+
+public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
+    callback: (err: any, page: DataPage&lt;MyData&gt;) =&gt; void): void {
+    base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
+}
+
+}
+
+let persistence = new MyPostgresPersistence();
+persistence.configure(ConfigParams.fromTuples(
+    &#34;host&#34;, &#34;localhost&#34;,
+    &#34;port&#34;, 27017
+));
+
+persitence.open(&#34;123&#34;, (err) =&gt; {
+    ...
+});
+
+persistence.create(&#34;123&#34;, { id: &#34;1&#34;, name: &#34;ABC&#34; }, (err, item) =&gt; {
+    persistence.getPageByFilter(
+        &#34;123&#34;,
+        FilterParams.fromTuples(&#34;name&#34;, &#34;ABC&#34;),
+        null,
+        (err, page) =&gt; {
+            console.log(page.data);          // Result: { id: &#34;1&#34;, name: &#34;ABC&#34; }
+
+            persistence.deleteById(&#34;123&#34;, &#34;1&#34;, (err, item) =&gt; {
+               ...
+            });
+        }
+    )
+});
+</pre>
+
+			<pre>type IdentifiablePostgresPersistence struct {
+    *<a href="index.html#PostgresPersistence">PostgresPersistence</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewIdentifiablePostgresPersistence">func <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=3767:3877#L93">NewIdentifiablePostgresPersistence</a>
+					<a class="permalink" href="index.html#NewIdentifiablePostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewIdentifiablePostgresPersistence(proto <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Type">Type</a>, tableName <a href="http://localhost:6060/pkg/builtin/#string">string</a>) *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a></pre>
+				<p>
+Creates a new instance of the persistence component.
+</p>
+<pre>- collection    (optional) a collection name.
+</pre>
+
+				
+				
+			
+
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.Create">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=6166:6286#L165">Create</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item interface{}) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Creates a data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- item              an item to be created.
+</pre>
+<p>
+Returns          (optional)  created item or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.DeleteById">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=10606:10728#L303">DeleteById</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.DeleteById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) DeleteById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id interface{}) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Deleted a data item by it&#39;s unique id.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- id                an id of the item to be deleted
+</pre>
+<p>
+Returns          (optional)  deleted item or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.DeleteByIds">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=11491:11591#L329">DeleteByIds</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.DeleteByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) DeleteByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []interface{}) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<p>
+Deletes multiple data items by their unique ids.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- ids               ids of data items to be deleted.
+</pre>
+<p>
+Returns          (optional)  error or null for success.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.GetListByIds">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=4319:4447#L108">GetListByIds</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.GetListByIds">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) GetListByIds(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, ids []interface{}) (items []interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a list of data items retrieved by given unique ids.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- ids               ids of data items to be retrieved
+</pre>
+<p>
+Returns          a data list or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.GetOneById">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=5208:5328#L136">GetOneById</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.GetOneById">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) GetOneById(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id interface{}) (item interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a data item by its unique id.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- id                an id of data item to be retrieved.
+</pre>
+<p>
+Returns           data item or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.Set">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=6804:6921#L182">Set</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.Set">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) Set(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item interface{}) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Sets a data item. If the data item exists it updates it,
+otherwise it create a new data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- item              a item to be set.
+</pre>
+<p>
+Returns          (optional)  updated item or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.Update">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=8133:8253#L227">Update</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.Update">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) Update(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item interface{}) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Updates a data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- item              an item to be updated.
+</pre>
+<p>
+Returns          (optional)  updated item or error.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="IdentifiablePostgresPersistence.UpdatePartially">func (*IdentifiablePostgresPersistence) <a href="http://localhost:6060/src/persistence/IdentifiablePostgresPersistence.go?s=9424:9576#L267">UpdatePartially</a>
+					<a class="permalink" href="index.html#IdentifiablePostgresPersistence.UpdatePartially">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#IdentifiablePostgresPersistence">IdentifiablePostgresPersistence</a>) UpdatePartially(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, id interface{}, data *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#AnyValueMap">AnyValueMap</a>) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Updates only few selected fields in a data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- id                an id of data item to be updated.
+- data              a map with fields to be updated.
+</pre>
+<p>
+Returns           updated item or error.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PostgresConnection">type <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=1797:2178#L34">PostgresConnection</a>
+				<a class="permalink" href="index.html#PostgresConnection">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+*
+</p>
+<pre>PostgreSQL connection using plain driver.
+
+By defining a connection and sharing it through multiple persistence components
+you can reduce number of used database connections.
+
+### Configuration parameters ###
+</pre>
+<p>
+- connection(s):
+</p>
+<pre>- discovery_key:             (optional) a key to retrieve the connection from IDiscovery
+- host:                      host name or IP address
+- port:                      port number (default: 27017)
+- uri:                       resource URI or connection string with all parameters in it
+</pre>
+<p>
+- credential(s):
+</p>
+<pre>- store_key:                 (optional) a key to retrieve the credentials from ICredentialStore
+- username:                  user name
+- password:                  user password
+</pre>
+<p>
+- options:
+</p>
+<pre>- connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
+- idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
+- max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
+</pre>
+<p>
+### References ###
+</p>
+<pre>- \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages
+- \*:discovery:\*:\*:1.0        (optional) IDiscovery services
+- \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
+</pre>
+
+			<pre>type PostgresConnection struct {
+
+    <span class="comment">// The logger.</span>
+<span id="PostgresConnection.Logger"></span>    Logger *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/">clog</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/#CompositeLogger">CompositeLogger</a>
+    <span class="comment">// The connection resolver.</span>
+<span id="PostgresConnection.ConnectionResolver"></span>    ConnectionResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/connect/">pcon</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-postgres-go/connect/#PostgresConnectionResolver">PostgresConnectionResolver</a>
+    <span class="comment">// The configuration options.</span>
+<span id="PostgresConnection.Options"></span>    Options *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/">cconf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/#ConfigParams">ConfigParams</a>
+    <span class="comment">// The PostgreSQL connection pool object.</span>
+<span id="PostgresConnection.Connection"></span>    Connection *<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/">pgxpool</a>.<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/#Pool">Pool</a>
+    <span class="comment">// The PostgreSQL database name.</span>
+<span id="PostgresConnection.DatabaseName"></span>    DatabaseName <a href="http://localhost:6060/pkg/builtin/#string">string</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewPostgresConnection">func <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=2257:2305#L49">NewPostgresConnection</a>
+					<a class="permalink" href="index.html#NewPostgresConnection">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewPostgresConnection() *<a href="index.html#PostgresConnection">PostgresConnection</a></pre>
+				<p>
+NewPostgresConnection creates a new instance of the connection component.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="PostgresConnection.Close">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=5045:5107#L129">Close</a>
+					<a class="permalink" href="index.html#PostgresConnection.Close">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) Close(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<p>
+Closes component and frees used resources.
+</p>
+<pre>- correlationId 	(optional) transaction id to trace execution through call chain.
+</pre>
+<p>
+Return			 error or nil no errors occured
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.Configure">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=2780:2846#L66">Configure</a>
+					<a class="permalink" href="index.html#PostgresConnection.Configure">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) Configure(config *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/">cconf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/#ConfigParams">ConfigParams</a>)</pre>
+				<p>
+Configures component by passing configuration parameters.
+</p>
+<pre>- config    configuration parameters to be set.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.GetConnection">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=5319:5377#L140">GetConnection</a>
+					<a class="permalink" href="index.html#PostgresConnection.GetConnection">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) GetConnection() *<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/">pgxpool</a>.<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/#Pool">Pool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.GetDatabaseName">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=5404:5457#L144">GetDatabaseName</a>
+					<a class="permalink" href="index.html#PostgresConnection.GetDatabaseName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) GetDatabaseName() <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.IsOpen">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=3381:3423#L81">IsOpen</a>
+					<a class="permalink" href="index.html#PostgresConnection.IsOpen">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) IsOpen() <a href="http://localhost:6060/pkg/builtin/#bool">bool</a></pre>
+				<p>
+Checks if the component is opened.
+Returns true if the component has been opened and false otherwise.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.Open">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=3617:3678#L88">Open</a>
+					<a class="permalink" href="index.html#PostgresConnection.Open">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) Open(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<p>
+Opens the component.
+</p>
+<pre>- correlationId 	(optional) transaction id to trace execution through call chain.
+- Return 			error or nil no errors occured.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresConnection.SetReferences">func (*PostgresConnection) <a href="http://localhost:6060/src/persistence/PostgresConnection.go?s=3112:3183#L74">SetReferences</a>
+					<a class="permalink" href="index.html#PostgresConnection.SetReferences">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresConnection">PostgresConnection</a>) SetReferences(references <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/">cref</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/#IReferences">IReferences</a>)</pre>
+				<p>
+Sets references to dependent components.
+</p>
+<pre>- references 	references to locate the component dependencies.
+</pre>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PostgresPersistence">type <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=3382:4164#L84">PostgresPersistence</a>
+				<a class="permalink" href="index.html#PostgresPersistence">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type PostgresPersistence struct {
+<span id="PostgresPersistence.ConvertFromPublic"></span>    ConvertFromPublic        func(interface{}) interface{}
+<span id="PostgresPersistence.ConvertToPublic"></span>    ConvertToPublic          func(pgx.<a href="index.html#Rows">Rows</a>) interface{}
+<span id="PostgresPersistence.ConvertFromPublicPartial"></span>    ConvertFromPublicPartial func(interface{}) interface{}
+
+    <span class="comment">//The dependency resolver.</span>
+<span id="PostgresPersistence.DependencyResolver"></span>    DependencyResolver *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/">cref</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/#DependencyResolver">DependencyResolver</a>
+    <span class="comment">//The logger.</span>
+<span id="PostgresPersistence.Logger"></span>    Logger *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/">clog</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-components-go/log/#CompositeLogger">CompositeLogger</a>
+    <span class="comment">//The PostgreSQL connection component.</span>
+<span id="PostgresPersistence.Connection"></span>    Connection *<a href="index.html#PostgresConnection">PostgresConnection</a>
+    <span class="comment">//The PostgreSQL connection pool object.</span>
+<span id="PostgresPersistence.Client"></span>    Client *<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/">pgxpool</a>.<a href="http://localhost:6060/pkg/github.com/jackc/pgx/v4/pgxpool/#Pool">Pool</a>
+    <span class="comment">//The PostgreSQL database name.</span>
+<span id="PostgresPersistence.DatabaseName"></span>    DatabaseName <a href="http://localhost:6060/pkg/builtin/#string">string</a>
+    <span class="comment">//The PostgreSQL table object.</span>
+<span id="PostgresPersistence.TableName"></span>    TableName   <a href="http://localhost:6060/pkg/builtin/#string">string</a>
+<span id="PostgresPersistence.MaxPageSize"></span>    MaxPageSize <a href="http://localhost:6060/pkg/builtin/#int">int</a>
+<span id="PostgresPersistence.Prototype"></span>    Prototype   <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Type">Type</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewPostgresPersistence">func <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=4267:4353#L115">NewPostgresPersistence</a>
+					<a class="permalink" href="index.html#NewPostgresPersistence">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewPostgresPersistence(proto <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Type">Type</a>, tableName <a href="http://localhost:6060/pkg/builtin/#string">string</a>) *<a href="index.html#PostgresPersistence">PostgresPersistence</a></pre>
+				<p>
+Creates a new instance of the persistence component.
+</p>
+<pre>- tableName    (optional) a table name.
+</pre>
+
+				
+				
+			
+
+			
+				
+				<h3 id="PostgresPersistence.AutoCreateObject">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=7558:7625#L232">AutoCreateObject</a>
+					<a class="permalink" href="index.html#PostgresPersistence.AutoCreateObject">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) AutoCreateObject(dmlStatement <a href="http://localhost:6060/pkg/builtin/#string">string</a>)</pre>
+				<p>
+Adds index definition to create it on opening
+</p>
+<pre>- dmlStatement DML statement to autocreate database object
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.AutoCreateObjects">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=11820:11901#L379">AutoCreateObjects</a>
+					<a class="permalink" href="index.html#PostgresPersistence.AutoCreateObjects">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) AutoCreateObjects(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.Clear">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=11346:11409#L362">Clear</a>
+					<a class="permalink" href="index.html#PostgresPersistence.Clear">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) Clear(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/builtin/#error">error</a></pre>
+				<p>
+Clears component state.
+</p>
+<pre>- correlationId 	(optional) transaction id to trace execution through call chain.
+- Returns 			error or nil no errors occured.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.Close">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=10795:10864#L339">Close</a>
+					<a class="permalink" href="index.html#PostgresPersistence.Close">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) Close(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Closes component and frees used resources.
+</p>
+<pre>- correlationId 	(optional) transaction id to trace execution through call chain.
+- Returns 			error or nil no errors occured.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.Configure">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=5241:5308#L145">Configure</a>
+					<a class="permalink" href="index.html#PostgresPersistence.Configure">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) Configure(config *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/">cconf</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/config/#ConfigParams">ConfigParams</a>)</pre>
+				<p>
+Configures component by passing configuration parameters.
+</p>
+<pre>- config    configuration parameters to be set.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.Create">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=23539:23647#L775">Create</a>
+					<a class="permalink" href="index.html#PostgresPersistence.Create">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) Create(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, item interface{}) (result interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Creates a data item.
+</p>
+<pre>- correlation_id    (optional) transaction id to trace execution through call chain.
+- item              an item to be created.
+- Returns          (optional) callback function that receives created item or error.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.DeleteByFilter">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=24738:24831#L807">DeleteByFilter</a>
+					<a class="permalink" href="index.html#PostgresPersistence.DeleteByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) DeleteByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Deletes data items that match to a given filter.
+This method shall be called by a func (c * PostgresPersistence) deleteByFilter method from child class that
+receives FilterParams and converts them into a filter function.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- filter            (optional) a filter JSON object.
+- Returns           error or nil for success.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.DereferenceObject">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=25607:25692#L842">DereferenceObject</a>
+					<a class="permalink" href="index.html#PostgresPersistence.DereferenceObject">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) DereferenceObject(docPointer <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Value">Value</a>) interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.EnsureIndex">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=6775:6880#L196">EnsureIndex</a>
+					<a class="permalink" href="index.html#PostgresPersistence.EnsureIndex">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) EnsureIndex(name <a href="http://localhost:6060/pkg/builtin/#string">string</a>, keys map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]<a href="http://localhost:6060/pkg/builtin/#string">string</a>, options map[<a href="http://localhost:6060/pkg/builtin/#string">string</a>]<a href="http://localhost:6060/pkg/builtin/#string">string</a>)</pre>
+				<p>
+Adds index definition to create it on opening
+</p>
+<pre>- keys index keys (fields)
+- options index options
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GenerateColumns">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=13080:13152#L424">GenerateColumns</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GenerateColumns">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GenerateColumns(values interface{}) <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
+				<p>
+Generates a list of column names to use in SQL statements like: &#34;column1,column2,column3&#34;
+</p>
+<pre>- values an array with column values or a key-value map
+</pre>
+<p>
+Returns a generated list of column names
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GenerateParameters">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=13600:13675#L444">GenerateParameters</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GenerateParameters">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GenerateParameters(values interface{}) <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
+				<p>
+Generates a list of value parameters to use in SQL statements like: &#34;$1,$2,$3&#34;
+</p>
+<pre>- values an array with values or a key-value map
+</pre>
+<p>
+Returns a generated list of value parameters
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GenerateSetParameters">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=14483:14586#L479">GenerateSetParameters</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GenerateSetParameters">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GenerateSetParameters(values interface{}) (params <a href="http://localhost:6060/pkg/builtin/#string">string</a>, columns <a href="http://localhost:6060/pkg/builtin/#string">string</a>)</pre>
+				<p>
+Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
+</p>
+<pre>- values a key-value map with columns and values
+</pre>
+<p>
+Returns a generated list of column sets
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GenerateValues">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=15175:15269#L503">GenerateValues</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GenerateValues">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GenerateValues(columns <a href="http://localhost:6060/pkg/builtin/#string">string</a>, values interface{}) []interface{}</pre>
+				<p>
+Generates a list of column parameters
+</p>
+<pre>- values a key-value map with columns and values
+</pre>
+<p>
+Returns a generated list of column values
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GetCountByFilter">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=19128:19241#L633">GetCountByFilter</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GetCountByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GetCountByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter interface{}) (count <a href="http://localhost:6060/pkg/builtin/#int64">int64</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a number of data items retrieved by a given filter.
+This method shall be called by a func (c * PostgresPersistence) getCountByFilter method from child class that
+receives FilterParams and converts them into a filter function.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- filter            (optional) a filter JSON object
+- Returns           data page or error.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GetListByFilter">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=20465:20620#L671">GetListByFilter</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GetListByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GetListByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter interface{}, sort interface{}, sel interface{}) (items []interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a list of data items retrieved by a given filter and sorted according to sort parameters.
+This method shall be called by a func (c * PostgresPersistence) getListByFilter method from child class that
+receives FilterParams and converts them into a filter function.
+</p>
+<pre>- correlationId    (optional) transaction id to trace execution through call chain.
+- filter           (optional) a filter JSON object
+- paging           (optional) paging parameters
+- sort             (optional) sorting JSON object
+- select           (optional) projection JSON object
+- Returns          data list or error.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GetOneRandom">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=21861:21975#L716">GetOneRandom</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GetOneRandom">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GetOneRandom(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter interface{}) (item interface{}, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a random item from items that match to a given filter.
+This method shall be called by a func (c * PostgresPersistence) getOneRandom method from child class that
+receives FilterParams and converts them into a filter function.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- filter            (optional) a filter JSON object
+- Returns            random item or error.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.GetPageByFilter">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=16724:16909#L546">GetPageByFilter</a>
+					<a class="permalink" href="index.html#PostgresPersistence.GetPageByFilter">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) GetPageByFilter(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>, filter interface{}, paging *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#PagingParams">PagingParams</a>,
+    sort interface{}, sel interface{}) (page *<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/">cdata</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/data/#DataPage">DataPage</a>, err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Gets a page of data items retrieved by a given filter and sorted according to sort parameters.
+This method shall be called by a func (c * PostgresPersistence) getPageByFilter method from child class that
+receives FilterParams and converts them into a filter function.
+</p>
+<pre>- correlationId     (optional) transaction id to trace execution through call chain.
+- filter            (optional) a filter JSON object
+- paging            (optional) paging parameters
+- sort              (optional) sorting JSON object
+- select            (optional) projection JSON object
+- Returns           receives a data page or error.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.IsOpen">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=9287:9330#L285">IsOpen</a>
+					<a class="permalink" href="index.html#PostgresPersistence.IsOpen">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) IsOpen() <a href="http://localhost:6060/pkg/builtin/#bool">bool</a></pre>
+				<p>
+Checks if the component is opened.
+Returns true if the component has been opened and false otherwise.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.NewObjectByPrototype">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=25426:25492#L834">NewObjectByPrototype</a>
+					<a class="permalink" href="index.html#PostgresPersistence.NewObjectByPrototype">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) NewObjectByPrototype() <a href="http://localhost:6060/pkg/reflect/">reflect</a>.<a href="http://localhost:6060/pkg/reflect/#Value">Value</a></pre>
+				<p>
+service function for return pointer on new prototype object for unmarshaling
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.Open">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=9515:9583#L292">Open</a>
+					<a class="permalink" href="index.html#PostgresPersistence.Open">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) Open(correlationId <a href="http://localhost:6060/pkg/builtin/#string">string</a>) (err <a href="http://localhost:6060/pkg/builtin/#error">error</a>)</pre>
+				<p>
+Opens the component.
+</p>
+<pre>- correlationId 	(optional) transaction id to trace execution through call chain.
+- Returns 			 error or nil no errors occured.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.PerformConvertFromPublic">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=8601:8686#L262">PerformConvertFromPublic</a>
+					<a class="permalink" href="index.html#PostgresPersistence.PerformConvertFromPublic">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) PerformConvertFromPublic(value interface{}) interface{}</pre>
+				<p>
+Convert object value from func (c * PostgresPersistence) to internal format.
+</p>
+<pre>- value     an object in func (c * PostgresPersistence) format to convert.
+</pre>
+<p>
+Returns converted object in internal format.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.PerformConvertFromPublicPartial">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=8869:8961#L269">PerformConvertFromPublicPartial</a>
+					<a class="permalink" href="index.html#PostgresPersistence.PerformConvertFromPublicPartial">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) PerformConvertFromPublicPartial(value interface{}) interface{}</pre>
+				<p>
+Converts the given object from the public partial format.
+</p>
+<pre>- value     the object to convert from the public partial format.
+</pre>
+<p>
+Returns the initial object.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.PerformConvertToPublic">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=7893:7972#L239">PerformConvertToPublic</a>
+					<a class="permalink" href="index.html#PostgresPersistence.PerformConvertToPublic">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) PerformConvertToPublic(rows pgx.<a href="index.html#Rows">Rows</a>) interface{}</pre>
+				<p>
+Converts object value from internal to func (c * PostgresPersistence) format.
+</p>
+<pre>- value     an object in internal format to convert.
+</pre>
+<p>
+Returns converted object in func (c * PostgresPersistence) format.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.QuoteIdentifier">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=9002:9068#L273">QuoteIdentifier</a>
+					<a class="permalink" href="index.html#PostgresPersistence.QuoteIdentifier">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) QuoteIdentifier(value <a href="http://localhost:6060/pkg/builtin/#string">string</a>) <a href="http://localhost:6060/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.SetReferences">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=5760:5832#L158">SetReferences</a>
+					<a class="permalink" href="index.html#PostgresPersistence.SetReferences">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) SetReferences(references <a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/">cref</a>.<a href="http://localhost:6060/pkg/github.com/pip-services3-go/pip-services3-commons-go/refer/#IReferences">IReferences</a>)</pre>
+				<p>
+Sets references to dependent components.
+</p>
+<pre>- references 	references to locate the component dependencies.
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="PostgresPersistence.UnsetReferences">func (*PostgresPersistence) <a href="http://localhost:6060/src/persistence/PostgresPersistence.go?s=6332:6379#L178">UnsetReferences</a>
+					<a class="permalink" href="index.html#PostgresPersistence.UnsetReferences">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (c *<a href="index.html#PostgresPersistence">PostgresPersistence</a>) UnsetReferences()</pre>
+				<p>
+Unsets (clears) previously set references to dependent components.
+</p>
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.13.15.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6060/LICENSE">BSD license</a>.<br>
+<a href="http://localhost:6060/doc/tos.html">Terms of Service</a> |
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>
