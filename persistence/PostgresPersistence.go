@@ -769,13 +769,10 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 		c.Logger.Trace(correlationId, "Random item wasn't found from %s", c.TableName)
 		return nil, qResult2.Err()
 	}
-	rows, vErr := qResult.Values()
-	if vErr == nil {
-		item := c.ConvertToPublic(qResult2)
-		c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
-		return item, nil
-	}
-	return nil, vErr
+	item = c.ConvertToPublic(qResult2)
+	c.Logger.Trace(correlationId, "Retrieved random item from %s", c.TableName)
+	return item, nil
+
 }
 
 // Creates a data item.
