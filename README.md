@@ -1,12 +1,11 @@
 # <img src="https://uploads-ssl.webflow.com/5ea5d3315186cf5ec60c3ee4/5edf1c94ce4c859f2b188094_logo.svg" alt="Pip.Services Logo" width="200"> <br/> PostgreSQL components for Golang
 
-This module is a part of the [Pip.Services](http://pipservices.org) polyglot microservices toolkit.
+This module is a part of the [Pip.Services](http://pipservices.org) polyglot microservices toolkit. It provides a set of components to implement PostgreSQL persistence.
 
 The module contains the following packages:
- 
-- [**Build**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/build) - a standard factory for constructing components
-- [**Connect**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/connect) - instruments for configuring connections to the database.
-- [**Persistence**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/persistence) - abstract classes for working with the database that can be used for connecting to collections and performing basic CRUD operations
+- [**Build**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/build) - Factory to create PostreSQL persistence components.
+- [**Connect**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/connect) - Connection component to configure PostgreSQL connection to database.
+- [**Persistence**](https://godoc.org/github.com/pip-services3-go/pip-services3-postgres-go/persistence) - abstract persistence components to perform basic CRUD operations.
 
 <a name="links"></a> Quick links:
 
