@@ -238,12 +238,12 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 	c.EnsureSchema(builder)
 }
 
-// Adds a statement to schema definition.
-// This is a deprecated method. Use EnsureSchema instead.
-//   - schemaStatement a statement to be added to the schema
-func (c *PostgresPersistence) AutoCreateObject(schemaStatement string) {
-	c.EnsureSchema(schemaStatement)
-}
+// // Adds a statement to schema definition.
+// // This is a deprecated method. Use EnsureSchema instead.
+// //   - schemaStatement a statement to be added to the schema
+// func (c *PostgresPersistence) AutoCreateObject(schemaStatement string) {
+// 	c.EnsureSchema(schemaStatement)
+// }
 
 // Adds a statement to schema definition
 //   - schemaStatement a statement to be added to the schema

@@ -125,7 +125,7 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 
 	query := "CREATE TABLE IF NOT EXISTS " + c.QuoteIdentifier(c.TableName) +
 		" (\"id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")"
-	c.AutoCreateObject(query)
+	c.EnsureSchema(query)
 }
 
 // Converts object value from internal to public format.
