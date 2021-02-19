@@ -15,7 +15,6 @@ type DummyRefPostgresPersistence struct {
 }
 
 func NewDummyRefPostgresPersistence() *DummyRefPostgresPersistence {
-
 	proto := reflect.TypeOf(&tf.Dummy{})
 	return &DummyRefPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
 }

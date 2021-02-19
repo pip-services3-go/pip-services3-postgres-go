@@ -16,9 +16,14 @@ func NewDummyMapPostgresPersistence() *DummyMapPostgresPersistence {
 	var t map[string]interface{}
 	proto := reflect.TypeOf(t)
 	c := &DummyMapPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
-	c.AutoCreateObject("CREATE TABLE dummies (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
-	c.EnsureIndex("dummies_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
+	c.DefineSchema = c.PerformDefineSchema
 	return c
+}
+
+func (c *DummyMapPostgresPersistence) PerformDefineSchema() {
+	c.ClearSchema()
+	c.EnsureSchema("CREATE TABLE \"" + c.TableName + "\" (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
+	c.EnsureIndex(c.TableName+"_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
 }
 
 func (c *DummyMapPostgresPersistence) Create(correlationId string, item map[string]interface{}) (result map[string]interface{}, err error) {

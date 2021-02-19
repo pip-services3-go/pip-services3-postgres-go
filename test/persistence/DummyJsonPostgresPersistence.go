@@ -17,10 +17,14 @@ func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence {
 	c := &DummyJsonPostgresPersistence{
 		IdentifiableJsonPostgresPersistence: *ppersist.NewIdentifiableJsonPostgresPersistence(proto, "dummies_json"),
 	}
-
-	c.EnsureTable("", "")
-	c.EnsureIndex("dummies_json_key", map[string]string{"(data->'key')": "1"}, map[string]string{"unique": "true"})
+	c.DefineSchema = c.PerformDefineSchema
 	return c
+}
+
+func (c *DummyJsonPostgresPersistence) PerformDefineSchema() {
+	c.ClearSchema()
+	c.EnsureTable("", "")
+	c.EnsureIndex(c.TableName+"_key", map[string]string{"(data->'key')": "1"}, map[string]string{"unique": "true"})
 }
 
 func (c *DummyJsonPostgresPersistence) GetPageByFilter(correlationId string, filter *cdata.FilterParams, paging *cdata.PagingParams) (page *tf.DummyPage, err error) {

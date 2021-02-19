@@ -94,15 +94,16 @@ accessing c._db or c._collection properties.
 type PostgresPersistence struct {
 	defaultConfig *cconf.ConfigParams
 
-	config          *cconf.ConfigParams
-	references      cref.IReferences
-	opened          bool
-	localConnection bool
-	autoObjects     []string
+	config           *cconf.ConfigParams
+	references       cref.IReferences
+	opened           bool
+	localConnection  bool
+	schemaStatements []string
 
 	ConvertFromPublic        func(interface{}) interface{}
 	ConvertToPublic          func(pgx.Rows) interface{}
 	ConvertFromPublicPartial func(interface{}) interface{}
+	DefineSchema             func()
 
 	//The dependency resolver.
 	DependencyResolver *cref.DependencyResolver
@@ -134,10 +135,10 @@ func NewPostgresPersistence(proto reflect.Type, tableName string) *PostgresPersi
 			"options.max_page_size", 100,
 			"options.debug", true,
 		),
-		autoObjects: make([]string, 0),
-		Logger:      clog.NewCompositeLogger(),
-		MaxPageSize: 100,
-		Prototype:   proto,
+		schemaStatements: make([]string, 0),
+		Logger:           clog.NewCompositeLogger(),
+		MaxPageSize:      100,
+		Prototype:        proto,
 	}
 
 	c.ConvertFromPublic = c.PerformConvertFromPublic
@@ -234,13 +235,25 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 
 	builder += "(" + fields + ")"
 
-	c.AutoCreateObject(builder)
+	c.EnsureSchema(builder)
 }
 
-// Adds index definition to create it on opening
-//   - dmlStatement DML statement to autocreate database object
-func (c *PostgresPersistence) AutoCreateObject(dmlStatement string) {
-	c.autoObjects = append(c.autoObjects, dmlStatement)
+// Adds a statement to schema definition.
+// This is a deprecated method. Use EnsureSchema instead.
+//   - schemaStatement a statement to be added to the schema
+func (c *PostgresPersistence) AutoCreateObject(schemaStatement string) {
+	c.EnsureSchema(schemaStatement)
+}
+
+// Adds a statement to schema definition
+//   - schemaStatement a statement to be added to the schema
+func (c *PostgresPersistence) EnsureSchema(schemaStatement string) {
+	c.schemaStatements = append(c.schemaStatements, schemaStatement)
+}
+
+// Clears all auto-created objects
+func (c *PostgresPersistence) ClearSchema() {
+	c.schemaStatements = []string{}
 }
 
 // Converts object value from internal to func (c * PostgresPersistence) format.
@@ -329,8 +342,13 @@ func (c *PostgresPersistence) Open(correlationId string) (err error) {
 	c.Client = c.Connection.GetConnection()
 	c.DatabaseName = c.Connection.GetDatabaseName()
 
+	// Define database schema
+	if c.DefineSchema != nil {
+		c.DefineSchema()
+	}
+
 	// Recreate objects
-	err = c.AutoCreateObjects(correlationId)
+	err = c.CreateSchema(correlationId)
 	if err != nil {
 		c.Client = nil
 		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").WithCause(err)
@@ -386,8 +404,8 @@ func (c *PostgresPersistence) Clear(correlationId string) error {
 	return err
 }
 
-func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error) {
-	if c.autoObjects == nil || len(c.autoObjects) == 0 {
+func (c *PostgresPersistence) CreateSchema(correlationId string) (err error) {
+	if c.schemaStatements == nil || len(c.schemaStatements) == 0 {
 		return nil
 	}
 
@@ -414,7 +432,7 @@ func (c *PostgresPersistence) AutoCreateObjects(correlationId string) (err error
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for _, dml := range c.autoObjects {
+		for _, dml := range c.schemaStatements {
 			qResult, err := c.Client.Query(context.TODO(), dml)
 			if err != nil {
 				c.Logger.Error(correlationId, err, "Failed to autocreate database object")

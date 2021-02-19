@@ -17,10 +17,15 @@ func NewDummyPostgresPersistence() *DummyPostgresPersistence {
 	c := &DummyPostgresPersistence{
 		IdentifiablePostgresPersistence: *ppersist.NewIdentifiablePostgresPersistence(proto, "dummies"),
 	}
-	// Row name must be in double quotes for properly case!!!
-	c.AutoCreateObject("CREATE TABLE dummies (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
-	c.EnsureIndex("dummies_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
+	c.DefineSchema = c.PerformDefineSchema
 	return c
+}
+
+func (c *DummyPostgresPersistence) PerformDefineSchema() {
+	c.ClearSchema()
+	// Row name must be in double quotes for properly case!!!
+	c.EnsureSchema("CREATE TABLE \"" + c.TableName + "\" (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
+	c.EnsureIndex(c.TableName+"_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
 }
 
 func (c *DummyPostgresPersistence) Create(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
