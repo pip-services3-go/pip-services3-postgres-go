@@ -807,8 +807,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	}
 
 	row := c.ConvertFromPublic(item)
-	columns := c.GenerateColumns(row)
-	params := c.GenerateParameters(row)
+	_, params, columns := c.GenerateSetParameters(row)
 	values := c.GenerateValues(columns, row)
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
