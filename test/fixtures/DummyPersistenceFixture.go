@@ -64,23 +64,35 @@ func (c *DummyPersistenceFixture) TestCrudOperations(t *testing.T) {
 	dummy1.Content = "Updated Content 1"
 	result, err = c.persistence.Update("", dummy1)
 	if err != nil {
-		t.Errorf("GetPageByFilter method error %v", err)
+		t.Errorf("Update method error %v", err)
 	}
 	assert.NotNil(t, result)
 	assert.Equal(t, dummy1.Id, result.Id)
 	assert.Equal(t, dummy1.Key, result.Key)
 	assert.Equal(t, dummy1.Content, result.Content)
 
-	// Set the dummy
+	// Set the dummy (updating)
 	dummy1.Content = "Updated Content 2"
 	result, err = c.persistence.Set("", dummy1)
 	if err != nil {
-		t.Errorf("GetPageByFilter method error %v", err)
+		t.Errorf("Set method error %v", err)
 	}
 	assert.NotNil(t, result)
 	assert.Equal(t, dummy1.Id, result.Id)
 	assert.Equal(t, dummy1.Key, result.Key)
 	assert.Equal(t, dummy1.Content, result.Content)
+
+	// Set the dummy (creating)
+	dummy2.Id = "New_id"
+	dummy2.Key = "New_key"
+	result, err = c.persistence.Set("", dummy2)
+	if err != nil {
+		t.Errorf("Set method error %v", err)
+	}
+	assert.NotNil(t, result)
+	assert.Equal(t, dummy2.Id, result.Id)
+	assert.Equal(t, dummy2.Key, result.Key)
+	assert.Equal(t, dummy2.Content, result.Content)
 
 	// Partially update the dummy
 	updateMap := cdata.NewAnyValueMapFromTuples("content", "Partially Updated Content 1")

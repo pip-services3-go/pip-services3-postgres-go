@@ -504,25 +504,28 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 // Generates a list of column sets to use in UPDATE statements like: column1=$1,column2=$2
 //   - values a key-value map with columns and values
 // Returns a generated list of column sets
-func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (params string, columns string) {
+func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (setParams string, params string, columns string) {
 
 	items := c.convertToMap(values)
 	if items == nil {
-		return "", ""
+		return "", "", ""
 	}
-	result := strings.Builder{}
-	col := strings.Builder{}
+	setParamsBuf := strings.Builder{}
+	paramsBuf := strings.Builder{}
+	colBuf := strings.Builder{}
 	index := 1
 	for column := range items {
-		if result.String() != "" {
-			result.WriteString(",")
-			col.WriteString(",")
+		if setParamsBuf.String() != "" {
+			setParamsBuf.WriteString(",")
+			colBuf.WriteString(",")
+			paramsBuf.WriteString(",")
 		}
-		result.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
-		col.WriteString(c.QuoteIdentifier(column))
+		setParamsBuf.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
+		paramsBuf.WriteString("$" + strconv.FormatInt((int64)(index), 16))
+		colBuf.WriteString(c.QuoteIdentifier(column))
 		index++
 	}
-	return result.String(), col.String()
+	return setParamsBuf.String(), paramsBuf.String(), colBuf.String()
 }
 
 // Generates a list of column parameters

@@ -201,8 +201,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	cmpersist.GenerateObjectId(&newItem)
 
 	row := c.ConvertFromPublic(item)
-	params := c.GenerateParameters(row)
-	setParams, columns := c.GenerateSetParameters(row)
+	setParams, params, columns := c.GenerateSetParameters(row)
 	values := c.GenerateValues(columns, row)
 	id := cmpersist.GetObjectId(newItem)
 
@@ -243,7 +242,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	id := cmpersist.GetObjectId(newItem)
 
 	row := c.ConvertFromPublic(newItem)
-	params, col := c.GenerateSetParameters(row)
+	params, _, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
 
@@ -280,7 +279,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	}
 
 	row := c.ConvertFromPublicPartial(data.Value())
-	params, col := c.GenerateSetParameters(row)
+	params, _, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
 

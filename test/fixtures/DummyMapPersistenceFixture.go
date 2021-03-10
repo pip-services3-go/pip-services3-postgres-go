@@ -63,23 +63,35 @@ func (c *DummyMapPersistenceFixture) TestCrudOperations(t *testing.T) {
 	dummy1["content"] = "Updated Content 1"
 	result, err = c.persistence.Update("", dummy1)
 	if err != nil {
-		t.Errorf("GetPageByFilter method error %v", err)
+		t.Errorf("Update method error %v", err)
 	}
 	assert.NotNil(t, result)
 	assert.Equal(t, dummy1["id"], result["id"])
 	assert.Equal(t, dummy1["key"], result["key"])
 	assert.Equal(t, dummy1["content"], result["content"])
 
-	// Set the dummy
+	// Set the dummy (updating)
 	dummy1["content"] = "Updated Content 2"
 	result, err = c.persistence.Set("", dummy1)
 	if err != nil {
-		t.Errorf("GetPageByFilter method error %v", err)
+		t.Errorf("Set method error %v", err)
 	}
 	assert.NotNil(t, result)
 	assert.Equal(t, dummy1["id"], result["id"])
 	assert.Equal(t, dummy1["key"], result["key"])
 	assert.Equal(t, dummy1["content"], result["content"])
+
+	// Set the dummy (creating)
+	dummy2["id"] = "New_id"
+	dummy2["key"] = "New_key"
+	result, err = c.persistence.Set("", dummy2)
+	if err != nil {
+		t.Errorf("Set method error %v", err)
+	}
+	assert.NotNil(t, result)
+	assert.Equal(t, dummy2["id"], result["id"])
+	assert.Equal(t, dummy2["key"], result["key"])
+	assert.Equal(t, dummy2["content"], result["content"])
 
 	// Partially update the dummy
 	updateMap := cdata.NewAnyValueMapFromTuples("content", "Partially Updated Content 1")
