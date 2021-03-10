@@ -110,6 +110,15 @@ func (c *DummyJsonPostgresPersistence) Update(correlationId string, item tf.Dumm
 	return result, err
 }
 
+func (c *DummyJsonPostgresPersistence) Set(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
+	value, err := c.IdentifiablePostgresPersistence.Set(correlationId, item)
+	if value != nil {
+		val, _ := value.(tf.Dummy)
+		result = val
+	}
+	return result, err
+}
+
 func (c *DummyJsonPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item tf.Dummy, err error) {
 	// In json persistence this method must call from IdentifiableJsonPostgresPersistence
 	result, err := c.IdentifiableJsonPostgresPersistence.UpdatePartially(correlationId, id, data)

@@ -38,7 +38,7 @@ accessing c._collection and c._model properties.
    - connect_timeout:      (optional) number of milliseconds to wait before timing out when connecting a new client (default: 0)
    - idle_timeout:         (optional) number of milliseconds a client must sit idle in the pool and not be checked out (default: 10000)
    - max_pool_size:        (optional) maximum number of clients the pool should contain (default: 10)
- 
+
 ### References ###
 
 - \*:logger:\*:\*:1.0           (optional) ILogger components to pass log messages components to pass log messages
@@ -46,13 +46,13 @@ accessing c._collection and c._model properties.
 - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
  *
 ### Example ###
- 
+
     class MyPostgresPersistence extends IdentifiablePostgresPersistence<MyData, string> {
- 
+
     public constructor() {
         base("mydata", new MyDataPostgresSchema());
     }
- 
+
     private composeFilter(filter: FilterParams): any {
         filter = filter || new FilterParams();
         let criteria = [];
@@ -61,7 +61,7 @@ accessing c._collection and c._model properties.
             criteria.push({ name: name });
         return criteria.length > 0 ? { $and: criteria } : null;
     }
- 
+
     public getPageByFilter(correlationId: string, filter: FilterParams, paging: PagingParams,
         callback: (err: any, page: DataPage<MyData>) => void): void {
         base.getPageByFilter(correlationId, c.composeFilter(filter), paging, null, null, callback);
@@ -201,10 +201,9 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	cmpersist.GenerateObjectId(&newItem)
 
 	row := c.ConvertFromPublic(item)
-	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
-	setParams, col := c.GenerateSetParameters(row)
-	values := c.GenerateValues(col, row)
+	setParams, columns := c.GenerateSetParameters(row)
+	values := c.GenerateValues(columns, row)
 	id := cmpersist.GetObjectId(newItem)
 
 	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ")" +

@@ -70,6 +70,15 @@ func (c *DummyPostgresPersistence) Update(correlationId string, item tf.Dummy) (
 	return result, err
 }
 
+func (c *DummyPostgresPersistence) Set(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
+	value, err := c.IdentifiablePostgresPersistence.Set(correlationId, item)
+	if value != nil {
+		val, _ := value.(tf.Dummy)
+		result = val
+	}
+	return result, err
+}
+
 func (c *DummyPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item tf.Dummy, err error) {
 	result, err := c.IdentifiablePostgresPersistence.UpdatePartially(correlationId, id, data)
 

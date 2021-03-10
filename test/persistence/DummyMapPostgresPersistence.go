@@ -69,6 +69,16 @@ func (c *DummyMapPostgresPersistence) Update(correlationId string, item map[stri
 	return result, err
 }
 
+func (c *DummyMapPostgresPersistence) Set(correlationId string, item map[string]interface{}) (result map[string]interface{}, err error) {
+	value, err := c.IdentifiablePostgresPersistence.Set(correlationId, item)
+
+	if value != nil {
+		val, _ := value.(map[string]interface{})
+		result = val
+	}
+	return result, err
+}
+
 func (c *DummyMapPostgresPersistence) UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item map[string]interface{}, err error) {
 	result, err := c.IdentifiablePostgresPersistence.UpdatePartially(correlationId, id, data)
 

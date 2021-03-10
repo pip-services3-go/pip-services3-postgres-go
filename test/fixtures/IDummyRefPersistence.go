@@ -9,6 +9,7 @@ type IDummyRefPersistence interface {
 	GetOneById(correlationId string, id string) (item *Dummy, err error)
 	Create(correlationId string, item *Dummy) (result *Dummy, err error)
 	Update(correlationId string, item *Dummy) (result *Dummy, err error)
+	Set(correlationId string, item *Dummy) (result *Dummy, err error)
 	UpdatePartially(correlationId string, id string, data *cdata.AnyValueMap) (item *Dummy, err error)
 	DeleteById(correlationId string, id string) (item *Dummy, err error)
 	DeleteByIds(correlationId string, ids []string) (err error)
