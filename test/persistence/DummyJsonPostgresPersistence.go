@@ -4,24 +4,22 @@ import (
 	"reflect"
 
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	persist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 )
 
 type DummyJsonPostgresPersistence struct {
-	ppersist.IdentifiableJsonPostgresPersistence
+	persist.IdentifiableJsonPostgresPersistence
 }
 
 func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence {
 	proto := reflect.TypeOf(tf.Dummy{})
-	c := &DummyJsonPostgresPersistence{
-		IdentifiableJsonPostgresPersistence: *ppersist.NewIdentifiableJsonPostgresPersistence(proto, "dummies_json"),
-	}
-	c.DefineSchema = c.PerformDefineSchema
+	c := &DummyJsonPostgresPersistence{}
+	c.IdentifiableJsonPostgresPersistence = *persist.InheritIdentifiableJsonPostgresPersistence(c, proto, "dummies_json")
 	return c
 }
 
-func (c *DummyJsonPostgresPersistence) PerformDefineSchema() {
+func (c *DummyJsonPostgresPersistence) DefineSchema() {
 	c.ClearSchema()
 	c.EnsureTable("", "")
 	c.EnsureIndex(c.TableName+"_key", map[string]string{"(data->'key')": "1"}, map[string]string{"unique": "true"})

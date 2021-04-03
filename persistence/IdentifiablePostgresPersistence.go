@@ -99,15 +99,16 @@ type IdentifiablePostgresPersistence struct {
 }
 
 // Creates a new instance of the persistence component.
-//   - collection    (optional) a collection name.
-func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *IdentifiablePostgresPersistence {
-	c := &IdentifiablePostgresPersistence{
-		PostgresPersistence: NewPostgresPersistence(proto, tableName),
-	}
-
+//   - overrides References to override virtual methods
+//   - tableName    (optional) a table name.
+func InheritIdentifiablePostgresPersistence(overrides IPostgresPersistenceOverrides, proto reflect.Type, tableName string) *IdentifiablePostgresPersistence {
 	if tableName == "" {
 		panic("Table name could not be empty")
 	}
+
+	c := &IdentifiablePostgresPersistence{}
+	c.PostgresPersistence = InheritPostgresPersistence(overrides, proto, tableName)
+
 	return c
 }
 
@@ -116,7 +117,6 @@ func NewIdentifiablePostgresPersistence(proto reflect.Type, tableName string) *I
 //   - ids               ids of data items to be retrieved
 // Returns          a data list or error.
 func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids []interface{}) (items []interface{}, err error) {
-
 	params := c.GenerateParameters(ids)
 	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName) + " WHERE \"id\" IN(" + params + ")"
 
@@ -128,7 +128,7 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 	items = make([]interface{}, 0, 0)
 	for qResult.Next() {
 
-		item := c.ConvertToPublic(qResult)
+		item := c.Overrides.ConvertToPublic(qResult)
 		items = append(items, item)
 	}
 
@@ -157,7 +157,7 @@ func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id in
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result := c.ConvertToPublic(qResult)
+		result := c.Overrides.ConvertToPublic(qResult)
 		if result == nil {
 			c.Logger.Trace(correlationId, "Nothing found from %s with id = %s", c.TableName, id)
 		} else {
@@ -200,7 +200,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	newItem = cmpersist.CloneObject(item)
 	cmpersist.GenerateObjectId(&newItem)
 
-	row := c.ConvertFromPublic(item)
+	row := c.Overrides.ConvertFromPublic(item)
 	params := c.GenerateParameters(row)
 	setParams, columns := c.GenerateSetParameters(row)
 	values := c.GenerateValues(columns, row)
@@ -221,7 +221,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result := c.ConvertToPublic(qResult)
+		result := c.Overrides.ConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Set in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -242,7 +242,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	newItem = cmpersist.CloneObject(item)
 	id := cmpersist.GetObjectId(newItem)
 
-	row := c.ConvertFromPublic(newItem)
+	row := c.Overrides.ConvertFromPublic(newItem)
 	params, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
@@ -261,7 +261,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result := c.ConvertToPublic(qResult)
+		result := c.Overrides.ConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Updated in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -279,7 +279,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 		return nil, nil
 	}
 
-	row := c.ConvertFromPublicPartial(data.Value())
+	row := c.Overrides.ConvertFromPublicPartial(data.Value())
 	params, col := c.GenerateSetParameters(row)
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
@@ -298,7 +298,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result := c.ConvertToPublic(qResult)
+		result := c.Overrides.ConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
 		return result, nil
 	}
@@ -324,7 +324,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.ConvertToPublic(qResult)
+		result = c.Overrides.ConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Deleted from %s with id = %s", c.TableName, id)
 		return result, nil
 	}

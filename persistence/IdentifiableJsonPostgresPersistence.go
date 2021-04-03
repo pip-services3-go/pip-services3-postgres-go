@@ -101,14 +101,11 @@ type IdentifiableJsonPostgresPersistence struct {
 }
 
 // Creates a new instance of the persistence component.
-//   - collection    (optional) a collection name.
-func NewIdentifiableJsonPostgresPersistence(proto reflect.Type, tableName string) *IdentifiableJsonPostgresPersistence {
-	c := &IdentifiableJsonPostgresPersistence{
-		IdentifiablePostgresPersistence: *NewIdentifiablePostgresPersistence(proto, tableName),
-	}
-	c.ConvertFromPublic = c.PerformConvertFromPublic
-	c.ConvertToPublic = c.PerformConvertToPublic
-	c.ConvertFromPublicPartial = c.PerformConvertFromPublic
+//   - overrides References to override virtual methods
+//   - tableName    (optional) a table name.
+func InheritIdentifiableJsonPostgresPersistence(overrides IPostgresPersistenceOverrides, proto reflect.Type, tableName string) *IdentifiableJsonPostgresPersistence {
+	c := &IdentifiableJsonPostgresPersistence{}
+	c.IdentifiablePostgresPersistence = *InheritIdentifiablePostgresPersistence(overrides, proto, tableName)
 	return c
 }
 
@@ -131,7 +128,7 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 // Converts object value from internal to public format.
 //   - value     an object in internal format to convert.
 // Returns converted object in public format.
-func (c *IdentifiableJsonPostgresPersistence) PerformConvertToPublic(rows pgx.Rows) interface{} {
+func (c *IdentifiableJsonPostgresPersistence) ConvertToPublic(rows pgx.Rows) interface{} {
 
 	values, valErr := rows.Values()
 	if valErr != nil || values == nil {
@@ -160,7 +157,7 @@ func (c *IdentifiableJsonPostgresPersistence) PerformConvertToPublic(rows pgx.Ro
 // Convert object value from public to internal format.
 //    - value     an object in public format to convert.
 // Returns converted object in internal format.
-func (c *IdentifiableJsonPostgresPersistence) PerformConvertFromPublic(value interface{}) interface{} {
+func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublic(value interface{}) interface{} {
 	if value == nil {
 		return nil
 	}
@@ -171,6 +168,13 @@ func (c *IdentifiableJsonPostgresPersistence) PerformConvertFromPublic(value int
 		"data": value,
 	}
 	return result
+}
+
+// Convert object value from public to internal format.
+//    - value     an object in public format to convert.
+// Returns converted object in internal format.
+func (c *IdentifiableJsonPostgresPersistence) ConvertFromPublicPartial(value interface{}) interface{} {
+	return c.ConvertFromPublic(value)
 }
 
 // Updates only few selected fields in a data item.
@@ -199,7 +203,7 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 	}
 	rows, vErr := qResult.Values()
 	if vErr == nil && len(rows) > 0 {
-		result = c.PerformConvertToPublic(qResult)
+		result = c.Overrides.ConvertToPublic(qResult)
 		c.Logger.Trace(correlationId, "Updated partially in %s with id = %s", c.TableName, id)
 		return result, nil
 	}

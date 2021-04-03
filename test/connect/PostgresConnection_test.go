@@ -1,16 +1,16 @@
-package test
+package test_connect
 
 import (
 	"os"
 	"testing"
 
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	conn "github.com/pip-services3-go/pip-services3-postgres-go/connect"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPostgresConnection(t *testing.T) {
-	var connection *ppersist.PostgresConnection
+	var connection *conn.PostgresConnection
 
 	postgresUri := os.Getenv("POSTGRES_URI")
 	postgresHost := os.Getenv("POSTGRES_HOST")
@@ -47,7 +47,7 @@ func TestPostgresConnection(t *testing.T) {
 		"credential.password", postgresPassword,
 	)
 
-	connection = ppersist.NewPostgresConnection()
+	connection = conn.NewPostgresConnection()
 	connection.Configure(dbConfig)
 	err := connection.Open("")
 	assert.Nil(t, err)

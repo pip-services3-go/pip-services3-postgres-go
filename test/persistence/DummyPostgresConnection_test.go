@@ -6,7 +6,7 @@ import (
 
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	conn "github.com/pip-services3-go/pip-services3-postgres-go/connect"
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +15,7 @@ func TestDummyPostgresConnection(t *testing.T) {
 
 	var persistence *DummyPostgresPersistence
 	var fixture tf.DummyPersistenceFixture
-	var connection *ppersist.PostgresConnection
+	var connection *conn.PostgresConnection
 
 	postgresUri := os.Getenv("POSTGRES_URI")
 	postgresHost := os.Getenv("POSTGRES_HOST")
@@ -55,7 +55,7 @@ func TestDummyPostgresConnection(t *testing.T) {
 		"credential.password", postgresPassword,
 	)
 
-	connection = ppersist.NewPostgresConnection()
+	connection = conn.NewPostgresConnection()
 	connection.Configure(dbConfig)
 
 	persistence = NewDummyPostgresPersistence()

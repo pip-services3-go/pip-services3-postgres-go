@@ -1,4 +1,4 @@
-package persistence
+package connect
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	clog "github.com/pip-services3-go/pip-services3-components-go/log"
-	pcon "github.com/pip-services3-go/pip-services3-postgres-go/connect"
 )
 
 /**
@@ -40,13 +39,13 @@ import (
  - \*:discovery:\*:\*:1.0        (optional) IDiscovery services
  - \*:credential-store:\*:\*:1.0 (optional) Credential stores to resolve credentials
 
- */
+*/
 type PostgresConnection struct {
 	defaultConfig *cconf.ConfigParams
 	// The logger.
 	Logger *clog.CompositeLogger
 	// The connection resolver.
-	ConnectionResolver *pcon.PostgresConnectionResolver
+	ConnectionResolver *PostgresConnectionResolver
 	// The configuration options.
 	Options *cconf.ConfigParams
 	// The PostgreSQL connection pool object.
@@ -59,13 +58,12 @@ type PostgresConnection struct {
 func NewPostgresConnection() *PostgresConnection {
 	c := &PostgresConnection{
 		defaultConfig: cconf.NewConfigParamsFromTuples(
-
 			"options.connect_timeout", 0,
 			"options.idle_timeout", 10000,
 			"options.max_pool_size", 3,
 		),
 		Logger:             clog.NewCompositeLogger(),
-		ConnectionResolver: pcon.NewPostgresConnectionResolver(),
+		ConnectionResolver: NewPostgresConnectionResolver(),
 		Options:            cconf.NewEmptyConfigParams(),
 	}
 	return c

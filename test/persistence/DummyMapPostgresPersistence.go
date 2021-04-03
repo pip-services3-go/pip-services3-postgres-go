@@ -4,23 +4,23 @@ import (
 	"reflect"
 
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	persist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 )
 
 type DummyMapPostgresPersistence struct {
-	ppersist.IdentifiablePostgresPersistence
+	persist.IdentifiablePostgresPersistence
 }
 
 func NewDummyMapPostgresPersistence() *DummyMapPostgresPersistence {
 	var t map[string]interface{}
 	proto := reflect.TypeOf(t)
-	c := &DummyMapPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
-	c.DefineSchema = c.PerformDefineSchema
+	c := &DummyMapPostgresPersistence{}
+	c.IdentifiablePostgresPersistence = *persist.InheritIdentifiablePostgresPersistence(c, proto, "dummies")
 	return c
 }
 
-func (c *DummyMapPostgresPersistence) PerformDefineSchema() {
+func (c *DummyMapPostgresPersistence) DefineSchema() {
 	c.ClearSchema()
 	c.EnsureSchema("CREATE TABLE \"" + c.TableName + "\" (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
 	c.EnsureIndex(c.TableName+"_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})

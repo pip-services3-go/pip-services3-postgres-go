@@ -1,5 +1,14 @@
 # <img src="https://uploads-ssl.webflow.com/5ea5d3315186cf5ec60c3ee4/5edf1c94ce4c859f2b188094_logo.svg" alt="Pip.Services Logo" width="200"> <br/> PostgreSQL components for Golang Changelog
 
+## <a name="1.2.0"></a> 1.2.0 (2021-04-03) 
+
+### Features
+* Moved PostgresConnection to connect package
+* Added IPostgresPersistenceOverride interface to overload virtual methods
+
+### Breaking changes
+* Method autoCreateObject is deprecated and shall be renamed to ensureSchema
+
 ## <a name="1.1.0"></a> 1.1.0 (2021-02-18) 
 
 ### Features

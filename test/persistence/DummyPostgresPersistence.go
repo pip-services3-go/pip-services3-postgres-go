@@ -4,24 +4,22 @@ import (
 	"reflect"
 
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	persist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 )
 
 type DummyPostgresPersistence struct {
-	ppersist.IdentifiablePostgresPersistence
+	persist.IdentifiablePostgresPersistence
 }
 
 func NewDummyPostgresPersistence() *DummyPostgresPersistence {
 	proto := reflect.TypeOf(tf.Dummy{})
-	c := &DummyPostgresPersistence{
-		IdentifiablePostgresPersistence: *ppersist.NewIdentifiablePostgresPersistence(proto, "dummies"),
-	}
-	c.DefineSchema = c.PerformDefineSchema
+	c := &DummyPostgresPersistence{}
+	c.IdentifiablePostgresPersistence = *persist.InheritIdentifiablePostgresPersistence(c, proto, "dummies")
 	return c
 }
 
-func (c *DummyPostgresPersistence) PerformDefineSchema() {
+func (c *DummyPostgresPersistence) DefineSchema() {
 	c.ClearSchema()
 	// Row name must be in double quotes for properly case!!!
 	c.EnsureSchema("CREATE TABLE \"" + c.TableName + "\" (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")

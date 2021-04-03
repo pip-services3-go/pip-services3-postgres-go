@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
-	pcon "github.com/pip-services3-go/pip-services3-postgres-go/connect"
+	conn "github.com/pip-services3-go/pip-services3-postgres-go/connect"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestPostgresConnectionResolver(t *testing.T) {
 		"credential.password", "postgres",
 	)
 
-	resolver := pcon.NewPostgresConnectionResolver()
+	resolver := conn.NewPostgresConnectionResolver()
 	resolver.Configure(dbConfig)
 
 	config, err := resolver.Resolve("")
@@ -27,5 +27,4 @@ func TestPostgresConnectionResolver(t *testing.T) {
 
 	assert.NotNil(t, config)
 	assert.Equal(t, "postgres://postgres:postgres@localhost:5432/test?sslmode=verify-ca", config)
-
 }

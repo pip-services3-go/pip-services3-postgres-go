@@ -4,19 +4,21 @@ import (
 	"reflect"
 
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
-	ppersist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
+	persist "github.com/pip-services3-go/pip-services3-postgres-go/persistence"
 	tf "github.com/pip-services3-go/pip-services3-postgres-go/test/fixtures"
 )
 
 // extends IdentifiablePostgresPersistence<Dummy, string>
 // implements IDummyPersistence {
 type DummyRefPostgresPersistence struct {
-	ppersist.IdentifiablePostgresPersistence
+	persist.IdentifiablePostgresPersistence
 }
 
 func NewDummyRefPostgresPersistence() *DummyRefPostgresPersistence {
 	proto := reflect.TypeOf(&tf.Dummy{})
-	return &DummyRefPostgresPersistence{*ppersist.NewIdentifiablePostgresPersistence(proto, "dummies")}
+	c := &DummyRefPostgresPersistence{}
+	c.IdentifiablePostgresPersistence = *persist.InheritIdentifiablePostgresPersistence(c, proto, "dummies")
+	return c
 }
 
 func (c *DummyRefPostgresPersistence) Create(correlationId string, item *tf.Dummy) (result *tf.Dummy, err error) {
