@@ -178,7 +178,7 @@ func (c *IdentifiablePostgresPersistence) Create(correlationId string, item inte
 	}
 	// Assign unique id
 	var newItem interface{}
-	newItem = cmpersist.CloneObject(item)
+	newItem = cmpersist.CloneObject(item, c.Prototype)
 	cmpersist.GenerateObjectId(&newItem)
 
 	return c.PostgresPersistence.Create(correlationId, newItem)
@@ -197,7 +197,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 
 	// Assign unique id
 	var newItem interface{}
-	newItem = cmpersist.CloneObject(item)
+	newItem = cmpersist.CloneObject(item, c.Prototype)
 	cmpersist.GenerateObjectId(&newItem)
 
 	row := c.Overrides.ConvertFromPublic(item)
@@ -239,7 +239,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 		return nil, nil
 	}
 	var newItem interface{}
-	newItem = cmpersist.CloneObject(item)
+	newItem = cmpersist.CloneObject(item, c.Prototype)
 	id := cmpersist.GetObjectId(newItem)
 
 	row := c.Overrides.ConvertFromPublic(newItem)
