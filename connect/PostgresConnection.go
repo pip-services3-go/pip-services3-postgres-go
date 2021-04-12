@@ -108,6 +108,11 @@ func (c *PostgresConnection) Open(correlationId string) error {
 
 	config, err := pgxpool.ParseConfig(uri)
 
+	if err != nil {
+		c.Logger.Error(correlationId, err, "Failed to parse Postgres config string")
+		return nil
+	}
+
 	if connectTimeoutMS != nil && *connectTimeoutMS != 0 {
 		config.ConnConfig.ConnectTimeout = time.Duration((int64)(*connectTimeoutMS)) * time.Millisecond
 	}
