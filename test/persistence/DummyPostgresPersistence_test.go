@@ -35,7 +35,7 @@ func TestDummyPostgresPersistence(t *testing.T) {
 	}
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
 	if postgresPassword == "" {
-		postgresPassword = "postgres"
+		postgresPassword = "postgres#"
 	}
 
 	if postgresUri == "" && postgresHost == "" {

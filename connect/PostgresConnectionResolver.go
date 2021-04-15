@@ -1,9 +1,6 @@
 package connect
 
 import (
-	"strconv"
-	"sync"
-
 	pgx4 "github.com/jackc/pgx/v4"
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
@@ -11,6 +8,8 @@ import (
 	crefer "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	"github.com/pip-services3-go/pip-services3-components-go/auth"
 	ccon "github.com/pip-services3-go/pip-services3-components-go/connect"
+	"net/url"
+	"strconv"
 )
 
 /*
@@ -233,11 +232,12 @@ func (c *PostgresConnectionResolver) composeUri(connections []*ccon.ConnectionPa
 		}
 	}
 	if len(params) > 0 {
-		params = "?" + params
+		params = "?" + url.PathEscape(params)
 	}
 
 	// Compose uri
-	uri := "postgres://" + auth + hosts + database + params
+
+	uri := "postgres://" + url.PathEscape(auth) + hosts + database + params
 
 	return uri
 }
@@ -249,35 +249,19 @@ func (c *PostgresConnectionResolver) composeUri(connections []*ccon.ConnectionPa
 // Returns uri string, err error
 // resolved URI and error, if this occured.
 func (c *PostgresConnectionResolver) Resolve(correlationId string) (uri string, err error) {
-	var connections []*ccon.ConnectionParams
-	var credential *auth.CredentialParams
-	var errCred, errConn error
 
-	var wg sync.WaitGroup
-
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		connections, errConn = c.ConnectionResolver.ResolveAll(correlationId)
-		//Validate connections
-		if errConn == nil {
-			errConn = c.validateConnections(correlationId, connections)
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		credential, errCred = c.CredentialResolver.Lookup(correlationId)
-		// Credentials are not validated right now
-	}()
-	wg.Wait()
-
-	if errConn != nil {
-		return "", errConn
+	connections, err := c.ConnectionResolver.ResolveAll(correlationId)
+	//Validate connections
+	if err != nil {
+		return "", err
 	}
-	if errCred != nil {
-		return "", errCred
+	err = c.validateConnections(correlationId, connections)
+	if err != nil {
+		return "", err
 	}
-	//return c.composeConfig(connections, credential)
-	uri = c.composeUri(connections, credential)
-	return uri, nil
+	credential, err := c.CredentialResolver.Lookup(correlationId)
+	if err != nil {
+		return "", err
+	}
+	return c.composeUri(connections, credential), nil
 }

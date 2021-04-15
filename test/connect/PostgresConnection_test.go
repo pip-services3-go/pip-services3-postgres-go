@@ -31,7 +31,7 @@ func TestPostgresConnection(t *testing.T) {
 	}
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
 	if postgresPassword == "" {
-		postgresPassword = "postgres"
+		postgresPassword = "postgres#"
 	}
 
 	if postgresUri == "" && postgresHost == "" {
@@ -45,6 +45,7 @@ func TestPostgresConnection(t *testing.T) {
 		"connection.database", postgresDatabase,
 		"credential.username", postgresUser,
 		"credential.password", postgresPassword,
+		"options.max_pool_size", 10,
 	)
 
 	connection = conn.NewPostgresConnection()
