@@ -41,6 +41,7 @@ accessing c._db or c._collection properties.
 ### Configuration parameters ###
 
 - collection:                  (optional) PostgreSQL collection name
+- schema:                  	   (optional) PostgreSQL schema, default "public"
 - connection(s):
    - discovery_key:             (optional) a key to retrieve the connection from IDiscovery
    - host:                      host name or IP address
