@@ -49,6 +49,7 @@ func TestDummyPostgresPersistence(t *testing.T) {
 		"connection.database", postgresDatabase,
 		"credential.username", postgresUser,
 		"credential.password", postgresPassword,
+		"schema", "test_schema",
 	)
 
 	persistence = NewDummyPostgresPersistence()

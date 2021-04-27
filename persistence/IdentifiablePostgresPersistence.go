@@ -118,7 +118,7 @@ func InheritIdentifiablePostgresPersistence(overrides IPostgresPersistenceOverri
 // Returns          a data list or error.
 func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids []interface{}) (items []interface{}, err error) {
 	params := c.GenerateParameters(ids)
-	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName) + " WHERE \"id\" IN(" + params + ")"
+	query := "SELECT * FROM " + c.QuoteTableNameWithSchema() + " WHERE \"id\" IN(" + params + ")"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, ids...)
 	if qErr != nil {
@@ -145,7 +145,7 @@ func (c *IdentifiablePostgresPersistence) GetListByIds(correlationId string, ids
 // Returns           data item or error.
 func (c *IdentifiablePostgresPersistence) GetOneById(correlationId string, id interface{}) (item interface{}, err error) {
 
-	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName) + " WHERE \"id\"=$1"
+	query := "SELECT * FROM " + c.QuoteTableNameWithSchema() + " WHERE \"id\"=$1"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, id)
 	if qErr != nil {
@@ -206,7 +206,7 @@ func (c *IdentifiablePostgresPersistence) Set(correlationId string, item interfa
 	values := c.GenerateValues(columns, row)
 	id := cmpersist.GetObjectId(newItem)
 
-	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ")" +
+	query := "INSERT INTO " + c.QuoteTableNameWithSchema() + " (" + columns + ")" +
 		" VALUES (" + params + ")" +
 		" ON CONFLICT (\"id\") DO UPDATE SET " + setParams + " RETURNING *"
 
@@ -247,7 +247,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
 
-	query := "UPDATE " + c.QuoteIdentifier(c.TableName) +
+	query := "UPDATE " + c.QuoteTableNameWithSchema() +
 		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 16) + " RETURNING *"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
@@ -284,7 +284,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	values := c.GenerateValues(col, row)
 	values = append(values, id)
 
-	query := "UPDATE " + c.QuoteIdentifier(c.TableName) +
+	query := "UPDATE " + c.QuoteTableNameWithSchema() +
 		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 16) + " RETURNING *"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
@@ -311,7 +311,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 // Returns          (optional)  deleted item or error.
 func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id interface{}) (result interface{}, err error) {
 
-	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName) + " WHERE \"id\"=$1 RETURNING *"
+	query := "DELETE FROM " + c.QuoteTableNameWithSchema() + " WHERE \"id\"=$1 RETURNING *"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, id)
 
@@ -338,7 +338,7 @@ func (c *IdentifiablePostgresPersistence) DeleteById(correlationId string, id in
 func (c *IdentifiablePostgresPersistence) DeleteByIds(correlationId string, ids []interface{}) error {
 
 	params := c.GenerateParameters(ids)
-	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName) + " WHERE \"id\" IN(" + params + ")"
+	query := "DELETE FROM " + c.QuoteTableNameWithSchema() + " WHERE \"id\" IN(" + params + ")"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, ids...)
 

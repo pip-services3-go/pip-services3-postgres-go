@@ -21,6 +21,7 @@ func NewDummyJsonPostgresPersistence() *DummyJsonPostgresPersistence {
 
 func (c *DummyJsonPostgresPersistence) DefineSchema() {
 	c.ClearSchema()
+	c.IdentifiableJsonPostgresPersistence.DefineSchema()
 	c.EnsureTable("", "")
 	c.EnsureIndex(c.TableName+"_key", map[string]string{"(data->'key')": "1"}, map[string]string{"unique": "true"})
 }

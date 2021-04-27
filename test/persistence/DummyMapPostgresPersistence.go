@@ -22,6 +22,7 @@ func NewDummyMapPostgresPersistence() *DummyMapPostgresPersistence {
 
 func (c *DummyMapPostgresPersistence) DefineSchema() {
 	c.ClearSchema()
+	c.IdentifiablePostgresPersistence.DefineSchema()
 	c.EnsureSchema("CREATE TABLE \"" + c.TableName + "\" (\"id\" TEXT PRIMARY KEY, \"key\" TEXT, \"content\" TEXT)")
 	c.EnsureIndex(c.TableName+"_key", map[string]string{"key": "1"}, map[string]string{"unique": "true"})
 }

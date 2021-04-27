@@ -121,6 +121,8 @@ type PostgresPersistence struct {
 	Client *pgxpool.Pool
 	//The PostgreSQL database name.
 	DatabaseName string
+	//The PostgreSQL database schema name. If not set use "public" by default
+	SchemaName string
 	//The PostgreSQL table object.
 	TableName   string
 	MaxPageSize int
@@ -166,6 +168,7 @@ func (c *PostgresPersistence) Configure(config *cconf.ConfigParams) {
 	c.TableName = config.GetAsStringWithDefault("collection", c.TableName)
 	c.TableName = config.GetAsStringWithDefault("table", c.TableName)
 	c.MaxPageSize = config.GetAsIntegerWithDefault("options.max_page_size", c.MaxPageSize)
+	c.SchemaName = config.GetAsStringWithDefault("schema", c.SchemaName)
 }
 
 // Sets references to dependent components.
@@ -218,7 +221,7 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 		builder += " UNIQUE"
 	}
 
-	builder += " INDEX IF NOT EXISTS " + name + " ON " + c.QuoteIdentifier(c.TableName)
+	builder += " INDEX IF NOT EXISTS " + name + " ON " + c.QuoteTableNameWithSchema()
 
 	if options["type"] != "" {
 		builder += " " + options["type"]
@@ -242,9 +245,13 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 	c.EnsureSchema(builder)
 }
 
-// Defines a database schema for this persistence
+// Defines a database schema for this persistence, have to call in child class
 func (c *PostgresPersistence) DefineSchema() {
 	// Override in child classes
+
+	if len(c.SchemaName) > 0 {
+		c.EnsureSchema("CREATE SCHEMA IF NOT EXISTS " + c.QuoteIdentifier(c.SchemaName))
+	}
 }
 
 // // Adds a statement to schema definition.
@@ -311,6 +318,14 @@ func (c *PostgresPersistence) QuoteIdentifier(value string) string {
 	return "\"" + value + "\""
 }
 
+// Return quoted SchemaName with TableName ("schema"."table")
+func (c *PostgresPersistence) QuoteTableNameWithSchema() string {
+	if len(c.SchemaName) > 0 {
+		return c.QuoteIdentifier(c.SchemaName) + "." + c.QuoteIdentifier(c.TableName)
+	}
+	return c.QuoteIdentifier(c.TableName)
+}
+
 // Checks if the component is opened.
 // Returns true if the component has been opened and false otherwise.
 func (c *PostgresPersistence) IsOpen() bool {
@@ -360,7 +375,7 @@ func (c *PostgresPersistence) Open(correlationId string) (err error) {
 		err = cerr.NewConnectionError(correlationId, "CONNECT_FAILED", "Connection to postgres failed").WithCause(err)
 	} else {
 		c.opened = true
-		c.Logger.Debug(correlationId, "Connected to postgres database %s, collection %s", c.DatabaseName, c.QuoteIdentifier(c.TableName))
+		c.Logger.Debug(correlationId, "Connected to postgres database %s, collection %s", c.DatabaseName, c.QuoteTableNameWithSchema())
 	}
 
 	return err
@@ -399,7 +414,7 @@ func (c *PostgresPersistence) Clear(correlationId string) error {
 		return errors.New("Table name is not defined")
 	}
 
-	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
+	query := "DELETE FROM " + c.QuoteTableNameWithSchema()
 
 	qResult, err := c.Client.Query(context.TODO(), query)
 	if err != nil {
@@ -416,7 +431,7 @@ func (c *PostgresPersistence) CreateSchema(correlationId string) (err error) {
 	}
 
 	// Check if table exist to determine weither to auto create objects
-	query := "SELECT to_regclass('" + c.TableName + "')"
+	query := "SELECT to_regclass('" + c.QuoteTableNameWithSchema() + "')"
 	qResult, qErr := c.Client.Query(context.TODO(), query)
 	if qErr != nil {
 		return qErr
@@ -433,7 +448,7 @@ func (c *PostgresPersistence) CreateSchema(correlationId string) (err error) {
 			return nil
 		}
 	}
-	c.Logger.Debug(correlationId, "Table "+c.TableName+" does not exist. Creating database objects...")
+	c.Logger.Debug(correlationId, "Table "+c.QuoteTableNameWithSchema()+" does not exist. Creating database objects...")
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
@@ -580,10 +595,10 @@ func (c *PostgresPersistence) convertToMap(values interface{}) map[string]interf
 func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter interface{}, paging *cdata.PagingParams,
 	sort interface{}, sel interface{}) (page *cdata.DataPage, err error) {
 
-	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
+	query := "SELECT * FROM " + c.QuoteTableNameWithSchema()
 	if sel != nil {
 		if slct, ok := sel.(string); ok && slct != "" {
-			query = "SELECT " + slct + " FROM " + c.QuoteIdentifier(c.TableName)
+			query = "SELECT " + slct + " FROM " + c.QuoteTableNameWithSchema()
 		}
 	}
 
@@ -631,7 +646,7 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 	}
 
 	if pagingEnabled {
-		query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+		query := "SELECT COUNT(*) AS count FROM " + c.QuoteTableNameWithSchema()
 		if filter != nil {
 			if flt, ok := sel.(string); ok && flt != "" {
 				query += " WHERE " + flt
@@ -666,7 +681,7 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 //   - Returns           data page or error.
 func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter interface{}) (count int64, err error) {
 
-	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+	query := "SELECT COUNT(*) AS count FROM " + c.QuoteTableNameWithSchema()
 
 	if filter != nil {
 		if flt, ok := filter.(string); ok && flt != "" {
@@ -704,10 +719,10 @@ func (c *PostgresPersistence) GetCountByFilter(correlationId string, filter inte
 //   - Returns          data list or error.
 func (c *PostgresPersistence) GetListByFilter(correlationId string, filter interface{}, sort interface{}, sel interface{}) (items []interface{}, err error) {
 
-	query := "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
+	query := "SELECT * FROM " + c.QuoteTableNameWithSchema()
 	if sel != nil {
 		if slct, ok := sel.(string); ok && slct != "" {
-			query = "SELECT " + slct + " FROM " + c.QuoteIdentifier(c.TableName)
+			query = "SELECT " + slct + " FROM " + c.QuoteTableNameWithSchema()
 		}
 	}
 
@@ -749,7 +764,7 @@ func (c *PostgresPersistence) GetListByFilter(correlationId string, filter inter
 //   - Returns            random item or error.
 func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interface{}) (item interface{}, err error) {
 
-	query := "SELECT COUNT(*) AS count FROM " + c.QuoteIdentifier(c.TableName)
+	query := "SELECT COUNT(*) AS count FROM " + c.QuoteTableNameWithSchema()
 
 	if filter != nil {
 		if flt, ok := filter.(string); ok && flt != "" {
@@ -763,7 +778,7 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 	defer qResult.Close()
 
-	query = "SELECT * FROM " + c.QuoteIdentifier(c.TableName)
+	query = "SELECT * FROM " + c.QuoteTableNameWithSchema()
 	if filter != nil {
 		if flt, ok := filter.(string); ok && flt != "" {
 			query += " WHERE " + flt
@@ -813,7 +828,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 	columns := c.GenerateColumns(row)
 	params := c.GenerateParameters(row)
 	values := c.GenerateValues(columns, row)
-	query := "INSERT INTO " + c.QuoteIdentifier(c.TableName) + " (" + columns + ") VALUES (" + params + ") RETURNING *"
+	query := "INSERT INTO " + c.QuoteTableNameWithSchema() + " (" + columns + ") VALUES (" + params + ") RETURNING *"
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
 	if qErr != nil {
 		return nil, qErr
@@ -836,7 +851,7 @@ func (c *PostgresPersistence) Create(correlationId string, item interface{}) (re
 //   - filter            (optional) a filter JSON object.
 //   - Returns           error or nil for success.
 func (c *PostgresPersistence) DeleteByFilter(correlationId string, filter string) (err error) {
-	query := "DELETE FROM " + c.QuoteIdentifier(c.TableName)
+	query := "DELETE FROM " + c.QuoteTableNameWithSchema()
 	if filter != "" {
 		query += " WHERE " + filter
 	}
