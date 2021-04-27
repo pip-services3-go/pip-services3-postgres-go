@@ -501,7 +501,7 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 				result.WriteString(",")
 			}
 			result.WriteString("$")
-			result.WriteString(strconv.FormatInt((int64)(index), 16))
+			result.WriteString(strconv.FormatInt((int64)(index), 10))
 		}
 
 		return result.String()
@@ -517,7 +517,7 @@ func (c *PostgresPersistence) GenerateParameters(values interface{}) string {
 			result.WriteString(",")
 		}
 		result.WriteString("$")
-		result.WriteString(strconv.FormatInt((int64)(index), 16))
+		result.WriteString(strconv.FormatInt((int64)(index), 10))
 	}
 
 	return result.String()
@@ -540,7 +540,7 @@ func (c *PostgresPersistence) GenerateSetParameters(values interface{}) (setPara
 			setParamsBuf.WriteString(",")
 			colBuf.WriteString(",")
 		}
-		setParamsBuf.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 16))
+		setParamsBuf.WriteString(c.QuoteIdentifier(column) + "=$" + strconv.FormatInt((int64)(index), 10))
 		colBuf.WriteString(c.QuoteIdentifier(column))
 		index++
 	}

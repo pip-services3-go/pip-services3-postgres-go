@@ -248,7 +248,7 @@ func (c *IdentifiablePostgresPersistence) Update(correlationId string, item inte
 	values = append(values, id)
 
 	query := "UPDATE " + c.QuoteTableNameWithSchema() +
-		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 16) + " RETURNING *"
+		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 10) + " RETURNING *"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
 
@@ -285,7 +285,7 @@ func (c *IdentifiablePostgresPersistence) UpdatePartially(correlationId string, 
 	values = append(values, id)
 
 	query := "UPDATE " + c.QuoteTableNameWithSchema() +
-		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 16) + " RETURNING *"
+		" SET " + params + " WHERE \"id\"=$" + strconv.FormatInt((int64)(len(values)), 10) + " RETURNING *"
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
 
