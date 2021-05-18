@@ -100,6 +100,15 @@ func (c *DummyJsonPostgresPersistence) GetOneById(correlationId string, id strin
 	return item, err
 }
 
+func (c *DummyJsonPostgresPersistence) GetOneRandom(correlationId string) (item tf.Dummy, err error) {
+	result, err := c.IdentifiablePostgresPersistence.GetOneRandom(correlationId, nil)
+	if result != nil {
+		val, _ := result.(tf.Dummy)
+		item = val
+	}
+	return item, err
+}
+
 func (c *DummyJsonPostgresPersistence) Update(correlationId string, item tf.Dummy) (result tf.Dummy, err error) {
 	value, err := c.IdentifiablePostgresPersistence.Update(correlationId, item)
 	if value != nil {

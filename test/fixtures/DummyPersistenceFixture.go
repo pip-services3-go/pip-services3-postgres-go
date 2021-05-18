@@ -187,3 +187,42 @@ func (c *DummyPersistenceFixture) TestBatchOperations(t *testing.T) {
 	assert.Len(t, items, 0)
 
 }
+
+func (c *DummyPersistenceFixture) TestRandomOperation(t *testing.T) {
+	var dummy1 Dummy
+	var dummy2 Dummy
+
+	result, err := c.persistence.GetOneRandom("")
+	if err != nil {
+		t.Errorf("Create method error %v", err)
+	}
+	assert.Nil(t, result)
+
+	// Create one dummy
+	result, err = c.persistence.Create("", c.dummy1)
+	if err != nil {
+		t.Errorf("Create method error %v", err)
+	}
+	dummy1 = result
+	assert.NotNil(t, dummy1)
+	assert.NotNil(t, dummy1.Id)
+	assert.Equal(t, c.dummy1.Key, dummy1.Key)
+	assert.Equal(t, c.dummy1.Content, dummy1.Content)
+
+	// Create another dummy
+	result, err = c.persistence.Create("", c.dummy2)
+	if err != nil {
+		t.Errorf("Create method error %v", err)
+	}
+	dummy2 = result
+	assert.NotNil(t, dummy2)
+	assert.NotNil(t, dummy2.Id)
+	assert.Equal(t, c.dummy2.Key, dummy2.Key)
+	assert.Equal(t, c.dummy2.Content, dummy2.Content)
+
+	result, err = c.persistence.GetOneRandom("")
+	if err != nil {
+		t.Errorf("Create method error %v", err)
+	}
+	assert.NotNil(t, result)
+}

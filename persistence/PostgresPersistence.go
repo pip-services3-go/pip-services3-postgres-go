@@ -797,6 +797,11 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 		}
 	}
 
+	if count == 0 {
+		c.Logger.Trace(correlationId, "Can't retriev random item from %s. Table is empty.", c.TableName)
+		return nil, nil
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	pos := rand.Int63n(int64(count))
 	query += " OFFSET " + strconv.FormatInt(pos, 10) + " LIMIT 1"

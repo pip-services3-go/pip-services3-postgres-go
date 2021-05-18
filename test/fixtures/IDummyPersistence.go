@@ -14,4 +14,5 @@ type IDummyPersistence interface {
 	DeleteById(correlationId string, id string) (item Dummy, err error)
 	DeleteByIds(correlationId string, ids []string) (err error)
 	GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error)
+	GetOneRandom(correlationId string) (item Dummy, err error)
 }
