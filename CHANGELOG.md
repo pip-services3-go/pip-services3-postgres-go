@@ -1,5 +1,10 @@
 # <img src="https://uploads-ssl.webflow.com/5ea5d3315186cf5ec60c3ee4/5edf1c94ce4c859f2b188094_logo.svg" alt="Pip.Services Logo" width="200"> <br/> PostgreSQL components for Golang Changelog
 
+
+## <a name="1.2.6"></a> 1.2.6 (2021-04-27)
+### Bug fixing
+* Fix GetOneRandom method
+
 ## <a name="1.2.5"></a> 1.2.5 (2021-04-27)
 ### Bug fixing
 * Fix parameter index converting in GenerateSetParameters and GenerateParameters
