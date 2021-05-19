@@ -196,7 +196,9 @@ func (c *DummyPersistenceFixture) TestRandomOperation(t *testing.T) {
 	if err != nil {
 		t.Errorf("Create method error %v", err)
 	}
-	assert.Nil(t, result)
+	assert.Equal(t, result.Id, "")
+	assert.Equal(t, result.Key, "")
+	assert.Equal(t, result.Content, "")
 
 	// Create one dummy
 	result, err = c.persistence.Create("", c.dummy1)

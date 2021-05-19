@@ -792,8 +792,10 @@ func (c *PostgresPersistence) GetOneRandom(correlationId string, filter interfac
 	}
 	rows, _ := qResult.Values()
 	if len(rows) == 1 {
-		if row, ok := rows[0].(map[string]interface{}); ok {
-			count = cconv.LongConverter.ToLong(row["count"])
+		if row, ok := rows[0].(int64); ok {
+			count = row
+		} else {
+			count = 0
 		}
 	}
 

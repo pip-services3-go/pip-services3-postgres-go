@@ -69,7 +69,7 @@ func TestDummyPostgresPersistence(t *testing.T) {
 		return
 	}
 
-	t.Run("DummyPostgresConnection:CRUD", fixture.TestCrudOperations)
+	t.Run("DummyPostgresPersistence:CRUD", fixture.TestCrudOperations)
 
 	opnErr = persistence.Clear("")
 	if opnErr != nil {
@@ -77,6 +77,13 @@ func TestDummyPostgresPersistence(t *testing.T) {
 		return
 	}
 
-	t.Run("DummyPostgresConnection:Batch", fixture.TestBatchOperations)
+	t.Run("DummyPostgresPersistence:Batch", fixture.TestBatchOperations)
 
+	opnErr = persistence.Clear("")
+	if opnErr != nil {
+		t.Error("Error cleaned persistence", opnErr)
+		return
+	}
+
+	t.Run("DummyPostgresPersistence:Random", fixture.TestRandomOperation)
 }
