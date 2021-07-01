@@ -120,7 +120,7 @@ func (c *IdentifiableJsonPostgresPersistence) EnsureTable(idType string, dataTyp
 		dataType = "JSONB"
 	}
 
-	query := "CREATE TABLE IF NOT EXISTS " + c.QuoteTableNameWithSchema() +
+	query := "CREATE TABLE IF NOT EXISTS " + c.QuotedTableName() +
 		" (\"id\" " + idType + " PRIMARY KEY, \"data\" " + dataType + ")"
 	c.EnsureSchema(query)
 }
@@ -188,7 +188,7 @@ func (c *IdentifiableJsonPostgresPersistence) UpdatePartially(correlationId stri
 		return nil, nil
 	}
 
-	query := "UPDATE " + c.QuoteTableNameWithSchema() + " SET \"data\"=\"data\"||$2 WHERE \"id\"=$1 RETURNING *"
+	query := "UPDATE " + c.QuotedTableName() + " SET \"data\"=\"data\"||$2 WHERE \"id\"=$1 RETURNING *"
 	values := []interface{}{id, data.Value()}
 
 	qResult, qErr := c.Client.Query(context.TODO(), query, values...)
