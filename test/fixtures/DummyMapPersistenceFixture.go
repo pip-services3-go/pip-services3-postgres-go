@@ -46,12 +46,15 @@ func (c *DummyMapPersistenceFixture) TestCrudOperations(t *testing.T) {
 	assert.Equal(t, c.dummy2["key"], dummy2["key"])
 	assert.Equal(t, c.dummy2["content"], dummy2["content"])
 
-	page, errp := c.persistence.GetPageByFilter("", cdata.NewEmptyFilterParams(), cdata.NewEmptyPagingParams())
+	page, errp := c.persistence.GetPageByFilter("", cdata.NewEmptyFilterParams(), cdata.NewPagingParams(0, 5, true))
 	if errp != nil {
 		t.Errorf("GetPageByFilter method error %v", err)
 	}
 	assert.NotNil(t, page)
 	assert.Len(t, page.Data, 2)
+	assert.NotNil(t, page.Total)
+	assert.Equal(t, *page.Total, (int64)(2))
+
 	//Testing default sorting by Key field len
 
 	item1 := page.Data[0]

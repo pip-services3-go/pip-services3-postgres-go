@@ -675,8 +675,8 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 		page = cdata.NewDataPage(&count, items)
 		return page, qResult2.Err()
 	}
-	var total int64 = 0
-	page = cdata.NewDataPage(&total, items)
+
+	page = cdata.NewDataPage(nil, items)
 	return page, qResult.Err()
 }
 

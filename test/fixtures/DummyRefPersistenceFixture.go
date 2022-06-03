@@ -46,12 +46,14 @@ func (c *DummyRefPersistenceFixture) TestCrudOperations(t *testing.T) {
 	assert.Equal(t, c.dummy2.Key, dummy2.Key)
 	assert.Equal(t, c.dummy2.Content, dummy2.Content)
 
-	page, errp := c.persistence.GetPageByFilter("", cdata.NewEmptyFilterParams(), cdata.NewEmptyPagingParams())
+	page, errp := c.persistence.GetPageByFilter("", cdata.NewEmptyFilterParams(), cdata.NewPagingParams(0, 5, true))
 	if errp != nil {
 		t.Errorf("GetPageByFilter method error %v", err)
 	}
 	assert.NotNil(t, page)
 	assert.Len(t, page.Data, 2)
+	assert.NotNil(t, page.Total)
+	assert.Equal(t, *page.Total, (int64)(2))
 
 	item1 := page.Data[0]
 	assert.Equal(t, item1.Key, dummy1.Key)
