@@ -1,6 +1,14 @@
 # <img src="https://uploads-ssl.webflow.com/5ea5d3315186cf5ec60c3ee4/5edf1c94ce4c859f2b188094_logo.svg" alt="Pip.Services Logo" width="200"> <br/> PostgreSQL components for Golang Changelog
 
-## <a name="1.2.8"></a> 1.2.8 (2021-07-01)
+## <a name="1.2.9"></a> 1.2.9 (2022-06-16)
+### Bug fixing
+* Fixed query builder for total calculation in GetPageByFilter method
+
+## <a name="1.2.8"></a> 1.2.8 (2022-06-02)
+### Bug fixing
+* Fixed return total value
+
+## <a name="1.2.7"></a> 1.2.7 (2021-07-01)
 ### Features
 * Change method naming QuotedTableNameWithSchema -> QuotedTableName
 ## <a name="1.2.7"></a> 1.2.7 (2021-05-19)
