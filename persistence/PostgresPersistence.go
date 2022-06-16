@@ -655,7 +655,7 @@ func (c *PostgresPersistence) GetPageByFilter(correlationId string, filter inter
 	if pagingEnabled {
 		query := "SELECT COUNT(*) AS count FROM " + c.QuotedTableName()
 		if filter != nil {
-			if flt, ok := sel.(string); ok && flt != "" {
+			if flt, ok := filter.(string); ok && flt != "" {
 				query += " WHERE " + flt
 			}
 		}
