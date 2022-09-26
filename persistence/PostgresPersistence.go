@@ -222,12 +222,7 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 		builder += " UNIQUE"
 	}
 
-	//builder += " INDEX IF NOT EXISTS " + name + " ON " + c.QuotedTableName()
 	indexName := c.QuoteIdentifier(name)
-	if len(c.SchemaName) > 0 {
-		indexName = c.QuoteIdentifier(c.SchemaName) + "." + indexName
-	}
-
 	builder += " INDEX IF NOT EXISTS " + indexName + " ON " + c.QuotedTableName()
 
 	if options["type"] != "" {
@@ -239,7 +234,6 @@ func (c *PostgresPersistence) EnsureIndex(name string, keys map[string]string, o
 		if fields != "" {
 			fields += ", "
 		}
-		//fields += c.QuoteIdentifier(key)
 		fields += key
 		asc := keys[key]
 		if asc != "1" {
