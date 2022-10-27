@@ -136,13 +136,14 @@ func (c *DummyPostgresPersistence) GetPageByFilter(correlationId string, filter 
 	for i, v := range tempPage.Data {
 		data[i] = v.(tf.Dummy)
 	}
-	page = tf.NewDummyPage(&dataLen, data)
+	total := *tempPage.Total
+	page = tf.NewDummyPage(&total, data)
 	return page, err
 }
 
 func (c *DummyPostgresPersistence) GetCountByFilter(correlationId string, filter *cdata.FilterParams) (count int64, err error) {
 
-	if &filter == nil {
+	if filter == nil {
 		filter = cdata.NewEmptyFilterParams()
 	}
 
